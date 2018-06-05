@@ -2,9 +2,7 @@
 
 ## a golang library to make dealing with nintendo data easier
 
-### links
-
-- [godoc](https://godoc.org/gitlab.com/superwhiskers/libninty)
+[![GoDoc](https://godoc.org/gitlab.com/superwhiskers/libninty?status.svg)](https://godoc.org/gitlab.com/superwhiskers/libninty)
 
 ### projects that use this
 
