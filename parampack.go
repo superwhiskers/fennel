@@ -2,6 +2,7 @@ package libninty
 
 import (
 	"encoding/base64"
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
@@ -55,46 +56,37 @@ var NilParampack = Parampack{
 
 /*
 
-EncodeParampack is a method of the Parampack type that encodes a Parampack back into the source format
-(not implemented, do not use)
+StringifyParampack is a method of the Parampack type that returns a stringified version of the parampack
 
-func (p Parampack) encodeParampack(console string) (string, error) {
+*/
+func (p Parampack) StringifyParampack() string {
 
-	// not implemented, do not use
-	return "", nil
+	// it's just return the stringified version of the parampack
+	return fmt.Sprintf("\\title_id\\%s\\access_key\\%s\\platform_id\\%d\\region_id\\%d\\language_id\\%d\\country_id\\%d\\area_id\\%d\\network_restriction\\%d\\friend_restriction\\%d\\rating_restriction\\%d\\rating_organization\\%d\\transferable_id\\%s\\tz_name\\%s\\utc_offset\\%d\\remaster_version\\%d\\", p.TitleID, p.AccessKey, p.PlatformID, p.RegionID, p.LanguageID, p.CountryID, p.AreaID, p.NetworkRestriction, p.FriendRestriction, p.RatingRestriction, p.RatingOrganization, p.TransferableID, p.TimezoneName, p.UTCOffset, p.RemasterVersion)
 
 }
 
+/*
+
+EncodeParampack is a method of the Parampack type that encodes a stringified parampack into base64
+
 */
+func (p Parampack) EncodeParampack() string {
+
+	// convert the stringified parampack to base64
+	return base64.StdEncoding.EncodeToString([]byte(p.StringifyParampack()))
+
+}
 
 /*
 
-DecodeParampack takes a raw parampack from any source (wiiu or 3ds) and decodes it into a golang-compatible format
+UnstringifyParampack takes a stringified parampack and places it into a struct
 
 */
-func DecodeParampack(parampack string) (Parampack, error) {
-
-	// strip spaces
-	paramStripped := strings.Map(func(r rune) rune {
-		if unicode.IsSpace(r) {
-			return -1
-		}
-		return r
-	}, parampack)
-
-	// decode it from base64
-	decodedParampack, err := base64.StdEncoding.DecodeString(paramStripped)
-
-	// if there is an error
-	if err != nil {
-
-		// exit the function and return the error
-		return NilParampack, err
-
-	}
+func UnstringifyParampack(parampack string) Parampack {
 
 	// split it by backslashes
-	splitParampack := strings.Split(string(decodedParampack[:]), "\\")
+	splitParampack := strings.Split(parampack, "\\")
 
 	// variables to be placed into the struct
 	titleID := "0000000000000000"
@@ -240,7 +232,37 @@ func DecodeParampack(parampack string) (Parampack, error) {
 		RemasterVersion:    remasterVersion,
 	}
 
+	return returnableParampack
+
+}
+
+/*
+
+DecodeParampack takes a base64ed parampack and decodes it into a struct
+
+*/
+func DecodeParampack(parampack string) (Parampack, error) {
+
+	// strip spaces
+	paramStripped := strings.Map(func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return -1
+		}
+		return r
+	}, parampack)
+
+	// decode it from base64
+	decodedParampack, err := base64.StdEncoding.DecodeString(paramStripped)
+
+	// if there is an error
+	if err != nil {
+
+		// exit the function and return the error
+		return NilParampack, err
+
+	}
+
 	// and return it
-	return returnableParampack, nil
+	return UnstringifyParampack(string(decodedParampack[:])), nil
 
 }
