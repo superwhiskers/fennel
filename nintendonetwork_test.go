@@ -41,8 +41,9 @@ func TestNewNintendoNetworkClient(t *testing.T) {
 		HTTPClient: &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
-					Certificates: []tls.Certificate{keyPair},
-					ClientAuth:   tls.RequireAndVerifyClientCert,
+					Certificates:       []tls.Certificate{keyPair},
+					ClientAuth:         tls.RequireAndVerifyClientCert,
+					InsecureSkipVerify: true,
 				},
 			},
 		},
@@ -90,8 +91,8 @@ func TestDoesUserExist(t *testing.T) {
 
 	// nintendo network client information
 	nnClientInfo := NintendoNetworkClientInformation{
-		ClientID:     "daf6227853bcbdce3d75baee8332b",
-		ClientSecret: "3eff548eac636e2bf45bb7b375e7b6b0",
+		ClientID:     "ea25c66c26b403376b4c5ed94ab9cdea",
+		ClientSecret: "d137be62cb6a2b831cad8c013b92fb55",
 		DeviceCert:   "",
 		Environment:  "",
 		Country:      "",
@@ -104,7 +105,7 @@ func TestDoesUserExist(t *testing.T) {
 	}
 
 	// generate a new client
-	client, err := NewNintendoNetworkClient("https://account.pretendo.cc/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", nnClientInfo)
+	client, err := NewNintendoNetworkClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", nnClientInfo)
 
 	// test failed if an error occured
 	if err != nil {
@@ -115,7 +116,7 @@ func TestDoesUserExist(t *testing.T) {
 	}
 
 	// now check if a user exists
-	output, err := client.DoesUserExist("test01")
+	output, err := client.DoesUserExist("whiskers")
 
 	// fail if an error occured
 	if err != nil {
@@ -130,7 +131,7 @@ func TestDoesUserExist(t *testing.T) {
 	t.Logf("got: %+v", output)
 
 	// compare the expected output with the output
-	if output == true {
+	if output != true {
 
 		fmt.Printf("failed")
 

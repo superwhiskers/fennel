@@ -22,9 +22,10 @@ NintendoNetworkErrorXML is a struct that holds information from a nintendo netwo
 
 */
 type NintendoNetworkErrorXML struct {
-	Cause   string `xml:"errors>error>cause"`
-	Code    int    `xml:"errors>error>code"`
-	Message string `xml:"errors>error>message"`
+	XMLName xml.Name `xml:"errors"`
+	Cause   string   `xml:"error>cause"`
+	Code    int      `xml:"error>code"`
+	Message string   `xml:"error>message"`
 }
 
 /*
@@ -79,8 +80,9 @@ func NewNintendoNetworkClient(accountServer string, certificatePath string, keyP
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				Certificates: []tls.Certificate{keyPair},
-				ClientAuth:   tls.RequireAndVerifyClientCert,
+				Certificates:       []tls.Certificate{keyPair},
+				ClientAuth:         tls.RequireAndVerifyClientCert,
+				InsecureSkipVerify: true,
 			},
 		},
 	}
@@ -140,7 +142,7 @@ func (c NintendoNetworkClient) DoesUserExist(nnid string) (bool, error) {
 	if err != nil {
 
 		// return an error if there was one
-		return false, nil
+		return false, err
 
 	}
 
@@ -150,25 +152,33 @@ func (c NintendoNetworkClient) DoesUserExist(nnid string) (bool, error) {
 	// attempt to parse it as xml
 	err = xml.Unmarshal(resData, &errorXML)
 
-	// check if the user exists
+	// check an error occured
 	if err != nil {
 
-		// they might
-		if res.StatusCode == 400 {
-
-			// they do
-			return true, nil
-
-		} else if res.StatusCode == 200 {
-
-			// they don't
-			return false, nil
-
-		}
+		// if there was one, it means that the nnid does not exist
+		return false, nil
 
 	}
 
-	// there must be an error in your credentials
-	return false, errors.New("there is an error in your credentials")
+	// we check the error code
+	if errorXML.Code == 100 {
+
+		// it exists
+		return true, nil
+
+	} else if errorXML.Code == 1104 {
+
+		// user id format invalid
+		return false, errors.New("your user id format is invalid")
+
+	} else if errorXML.Code == 4 {
+
+		// invalid creds
+		return false, errors.New("there is an error in your credentials")
+
+	}
+
+	// if we get here, there was an unknown error
+	return false, errors.New("an unknown and unhandlable error occured")
 
 }
