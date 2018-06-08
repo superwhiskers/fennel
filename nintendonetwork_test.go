@@ -116,7 +116,7 @@ func TestDoesUserExist(t *testing.T) {
 	}
 
 	// now check if a user exists
-	output, err := client.DoesUserExist("whiskers")
+	output, _, err := client.DoesUserExist("whiskers")
 
 	// fail if an error occured
 	if err != nil {
