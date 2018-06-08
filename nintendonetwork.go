@@ -60,6 +60,32 @@ type NintendoNetworkClient struct {
 
 /*
 
+ParseErrorXML is a function that parses error xml and returns a NintendoNetworkErrorXML struct
+
+*/
+func ParseErrorXML(errorXML []byte) (NintendoNetworkErrorXML, error) {
+
+	// the error xml struct
+	var errorXMLParsed NintendoNetworkErrorXML
+
+	// attempt to parse it as xml
+	err := xml.Unmarshal(errorXML, &errorXMLParsed)
+
+	// check an error occured
+	if err != nil {
+
+		// return the error
+		return NintendoNetworkErrorXML{}, err
+
+	}
+
+	// return the parsed xml
+	return errorXMLParsed, nil
+
+}
+
+/*
+
 NewNintendoNetworkClient is a constructor function for creating a client to nintendo network servers
 
 */
@@ -96,6 +122,31 @@ func NewNintendoNetworkClient(accountServer string, certificatePath string, keyP
 
 	// and then return it
 	return nnClient, nil
+
+}
+
+/*
+
+Do is a method on NintendoNetworkClient that makes a request to any url with the nintendo network headers and clientcert
+
+*/
+func (c NintendoNetworkClient) Do(request *http.Request) (*http.Response, error) {
+
+	// set some headers
+	request.Header.Set("X-Nintendo-Client-ID", c.ClientInformation.ClientID)
+	request.Header.Set("X-Nintendo-Client-Secret", c.ClientInformation.ClientSecret)
+	request.Header.Set("X-Nintendo-Platform-ID", c.ClientInformation.PlatformID)
+	request.Header.Set("X-Nintendo-Device-Type", c.ClientInformation.DeviceType)
+	request.Header.Set("X-Nintendo-Device-ID", c.ClientInformation.DeviceID)
+	request.Header.Set("X-Nintendo-Serial-Number", c.ClientInformation.Serial)
+	request.Header.Set("X-Nintendo-System-Version", c.ClientInformation.SysVersion)
+	request.Header.Set("X-Nintendo-Region", c.ClientInformation.Region)
+	request.Header.Set("X-Nintendo-Country", c.ClientInformation.Country)
+	request.Header.Set("X-Nintendo-Environment", c.ClientInformation.Environment)
+	request.Header.Set("X-Nintendo-Device-Cert", c.ClientInformation.DeviceCert)
+
+	// do the request
+	return c.HTTPClient.Do(request)
 
 }
 
@@ -155,8 +206,8 @@ func (c NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetwork
 	// check an error occured
 	if err != nil {
 
-		// if there was one, it means that the nnid does not exist
-		return false, NintendoNetworkErrorXML{}, nil
+		// return the error
+		return false, NintendoNetworkErrorXML{}, err
 
 	}
 
