@@ -30,7 +30,7 @@ func TestDecodeServiceToken(t *testing.T) {
 	if output != expectedOutput {
 
 		// if they do not match, fail
-		t.FailNow()
+		t.Errorf("output mismatch...")
 
 	}
 

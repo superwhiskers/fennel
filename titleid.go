@@ -1,3 +1,10 @@
+/*
+
+titleid.go -
+contains things for dealing with encoded titleids
+
+*/
+
 package libninty
 
 import "strconv"

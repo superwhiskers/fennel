@@ -1,3 +1,10 @@
+/*
+
+parampack.go -
+contains things for handling parampacks
+
+*/
+
 package libninty
 
 import (

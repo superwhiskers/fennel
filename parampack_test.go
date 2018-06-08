@@ -46,7 +46,7 @@ func TestDecodeParampack(t *testing.T) {
 	if output != expectedOutput {
 
 		// if they do not match, fail
-		t.FailNow()
+		t.Errorf("output mismatch...")
 
 	}
 
@@ -88,7 +88,7 @@ func TestUnstringifyParampack(t *testing.T) {
 	if output != expectedOutput {
 
 		// if they do not match, fail
-		t.FailNow()
+		t.Errorf("output mismatch...")
 
 	}
 
@@ -129,7 +129,7 @@ func TestEncodeParampack(t *testing.T) {
 	if output != expectedOutput {
 
 		// if they do not match, fail
-		t.FailNow()
+		t.Errorf("output mismatch...")
 
 	}
 
@@ -170,7 +170,7 @@ func TestStringifyParampack(t *testing.T) {
 	if output != expectedOutput {
 
 		// if they do not match, fail
-		t.FailNow()
+		t.Errorf("output mismatch...")
 
 	}
 

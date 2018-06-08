@@ -1,3 +1,10 @@
+/*
+
+servicetoken.go -
+contains things for making encrypted servicetokens easier to deal with
+
+*/
+
 package libninty
 
 import (
