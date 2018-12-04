@@ -22,8 +22,9 @@ package libninty
 
 import (
 	"crypto/tls"
-	"net/http"
 	"testing"
+
+	"github.com/valyala/fasthttp"
 )
 
 func TestNewNintendoNetworkClient(t *testing.T) {
@@ -49,15 +50,13 @@ func TestNewNintendoNetworkClient(t *testing.T) {
 
 	}
 
-	expectedOutput := NintendoNetworkClient{
+	expectedOutput := &NintendoNetworkClient{
 		AccountServerAPIEndpoint: "https://account.pretendo.cc/v1/api",
-		HTTPClient: &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					Certificates:       []tls.Certificate{keyPair},
-					ClientAuth:         tls.RequireAndVerifyClientCert,
-					InsecureSkipVerify: true,
-				},
+		HTTPClient: &fasthttp.Client{
+			TLSConfig: &tls.Config{
+				Certificates:       []tls.Certificate{keyPair},
+				ClientAuth:         tls.RequireAndVerifyClientCert,
+				InsecureSkipVerify: true,
 			},
 		},
 		ClientInformation: NintendoNetworkClientInformation{

@@ -24,9 +24,9 @@ import (
 	"crypto/tls"
 	"encoding/xml"
 	"errors"
-	"io/ioutil"
-	"net/http"
 	"strings"
+
+	"github.com/valyala/fasthttp"
 )
 
 // NintendoNetworkErrorXML is a struct that holds information from a nintendo network error xml
@@ -55,7 +55,7 @@ type NintendoNetworkClientInformation struct {
 // NintendoNetworkClient is a struct that holds data used for connecting to nintendo network servers
 type NintendoNetworkClient struct {
 	AccountServerAPIEndpoint string
-	HTTPClient               *http.Client
+	HTTPClient               *fasthttp.Client
 	ClientInformation        NintendoNetworkClientInformation
 }
 
@@ -76,26 +76,24 @@ func ParseErrorXML(errorXML []byte) (NintendoNetworkErrorXML, error) {
 }
 
 // NewNintendoNetworkClient is a constructor function for creating a client to nintendo network servers
-func NewNintendoNetworkClient(accountServer string, certificatePath string, keyPath string, nnClientInfo NintendoNetworkClientInformation) (NintendoNetworkClient, error) {
+func NewNintendoNetworkClient(accountServer string, certificatePath string, keyPath string, nnClientInfo NintendoNetworkClientInformation) (*NintendoNetworkClient, error) {
 
 	keyPair, err := tls.LoadX509KeyPair(certificatePath, keyPath)
 	if err != nil {
 
-		return NintendoNetworkClient{}, err
+		return &NintendoNetworkClient{}, err
 
 	}
 
-	httpClient := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				Certificates:       []tls.Certificate{keyPair},
-				ClientAuth:         tls.RequireAndVerifyClientCert,
-				InsecureSkipVerify: true,
-			},
+	httpClient := &fasthttp.Client{
+		TLSConfig: &tls.Config{
+			Certificates:       []tls.Certificate{keyPair},
+			ClientAuth:         tls.RequireAndVerifyClientCert,
+			InsecureSkipVerify: true,
 		},
 	}
 
-	nnClient := NintendoNetworkClient{
+	nnClient := &NintendoNetworkClient{
 		AccountServerAPIEndpoint: accountServer,
 		HTTPClient:               httpClient,
 		ClientInformation:        nnClientInfo,
@@ -106,7 +104,7 @@ func NewNintendoNetworkClient(accountServer string, certificatePath string, keyP
 }
 
 // Do is a method on NintendoNetworkClient that makes a request to any url with the nintendo network headers and clientcert
-func (c NintendoNetworkClient) Do(request *http.Request) (*http.Response, error) {
+func (c *NintendoNetworkClient) Do(request *fasthttp.Request, response *fasthttp.Response) error {
 
 	request.Header.Set("X-Nintendo-Client-ID", c.ClientInformation.ClientID)
 	request.Header.Set("X-Nintendo-Client-Secret", c.ClientInformation.ClientSecret)
@@ -119,30 +117,28 @@ func (c NintendoNetworkClient) Do(request *http.Request) (*http.Response, error)
 	request.Header.Set("X-Nintendo-Country", c.ClientInformation.Country)
 	request.Header.Set("X-Nintendo-Environment", c.ClientInformation.Environment)
 	request.Header.Set("X-Nintendo-Device-Cert", c.ClientInformation.DeviceCert)
-	return c.HTTPClient.Do(request)
+
+	request.Header.Set("X-Nintendo-FPD-Version", "0000")
+
+	return c.HTTPClient.Do(request, response)
 
 }
 
 // DoesUserExist is a method on NintendoNetworkClient that requests info about a user from the nintendo network servers
-func (c NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetworkErrorXML, error) {
+func (c *NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetworkErrorXML, error) {
 
-	request, err := http.NewRequest("GET", strings.Join([]string{c.AccountServerAPIEndpoint, "/people/", nnid}, ""), nil)
-	if err != nil {
+	request := fasthttp.AcquireRequest()
+	response := fasthttp.AcquireResponse()
+	requestHeader := fasthttp.RequestHeader{}
 
-		return false, NintendoNetworkErrorXML{}, err
+	defer fasthttp.ReleaseRequest(request)
+	defer fasthttp.ReleaseResponse(response)
 
-	}
+	requestHeader.SetMethod("GET")
+	request.Header = requestHeader
+	request.SetRequestURI(strings.Join([]string{c.AccountServerAPIEndpoint, "/people/", nnid}, ""))
 
-	res, err := c.Do(request)
-	if err != nil {
-
-		return false, NintendoNetworkErrorXML{}, err
-
-	}
-
-	defer res.Body.Close()
-
-	resData, err := ioutil.ReadAll(res.Body)
+	err := c.Do(request, response)
 	if err != nil {
 
 		return false, NintendoNetworkErrorXML{}, err
@@ -151,7 +147,7 @@ func (c NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetwork
 
 	var errorXML NintendoNetworkErrorXML
 
-	err = xml.Unmarshal(resData, &errorXML)
+	err = xml.Unmarshal(response.Body(), &errorXML)
 	if err != nil {
 
 		return false, NintendoNetworkErrorXML{}, err
@@ -172,5 +168,12 @@ func (c NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetwork
 	}
 
 	return false, errorXML, errors.New("an unknown and unhandlable error occured")
+
+}
+
+// GetEULA retrieves the Nintendo Network EULA for the specified country
+func (c *NintendoNetworkClient) GetEULA(country string) ([]byte, NintendoNetworkErrorXML, error) {
+
+	return []byte{}, NintendoNetworkErrorXML{}, nil
 
 }
