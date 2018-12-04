@@ -22,7 +22,6 @@ package libninty
 
 import (
 	"crypto/tls"
-	"fmt"
 	"net/http"
 	"testing"
 )
@@ -117,9 +116,10 @@ func TestDoesUserExist(t *testing.T) {
 
 	}
 
-	output, _, err := client.DoesUserExist("whiskers")
+	output, xml, err := client.DoesUserExist("whiskers")
 	if err != nil {
 
+		t.Logf("error xml: %#v\n", xml)
 		t.Errorf("expected no error to occur, instead got %v\n", err)
 
 	}

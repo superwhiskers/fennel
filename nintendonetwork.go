@@ -133,7 +133,7 @@ func (c NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetwork
 
 	}
 
-	res, err := c.HTTPClient.Do(request)
+	res, err := c.Do(request)
 	if err != nil {
 
 		return false, NintendoNetworkErrorXML{}, err
