@@ -1,7 +1,20 @@
 /*
 
-nintendonetwork.go -
-contains things for interacting with the nintendo network api
+libninty - nintendo network utility library for golang
+Copyright (C) 2018 superwhiskers <whiskerdev@protonmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
@@ -16,11 +29,7 @@ import (
 	"strings"
 )
 
-/*
-
-NintendoNetworkErrorXML is a struct that holds information from a nintendo network error xml
-
-*/
+// NintendoNetworkErrorXML is a struct that holds information from a nintendo network error xml
 type NintendoNetworkErrorXML struct {
 	XMLName xml.Name `xml:"errors"`
 	Cause   string   `xml:"error>cause"`
@@ -28,11 +37,7 @@ type NintendoNetworkErrorXML struct {
 	Message string   `xml:"error>message"`
 }
 
-/*
-
-NintendoNetworkClientInformation is a struct that holds data that is used to make the servers believe we are an actual 3ds or wiiu
-
-*/
+// NintendoNetworkClientInformation is a struct that holds data that is used to make the servers believe we are an actual 3ds or wiiu
 type NintendoNetworkClientInformation struct {
 	ClientID     string
 	ClientSecret string
@@ -47,62 +52,39 @@ type NintendoNetworkClientInformation struct {
 	PlatformID   string
 }
 
-/*
-
-NintendoNetworkClient is a struct that holds data used for connecting to nintendo network servers
-
-*/
+// NintendoNetworkClient is a struct that holds data used for connecting to nintendo network servers
 type NintendoNetworkClient struct {
 	AccountServerAPIEndpoint string
 	HTTPClient               *http.Client
 	ClientInformation        NintendoNetworkClientInformation
 }
 
-/*
-
-ParseErrorXML is a function that parses error xml and returns a NintendoNetworkErrorXML struct
-
-*/
+// ParseErrorXML is a function that parses error xml and returns a NintendoNetworkErrorXML struct
 func ParseErrorXML(errorXML []byte) (NintendoNetworkErrorXML, error) {
 
-	// the error xml struct
 	var errorXMLParsed NintendoNetworkErrorXML
 
-	// attempt to parse it as xml
 	err := xml.Unmarshal(errorXML, &errorXMLParsed)
-
-	// check an error occured
 	if err != nil {
 
-		// return the error
 		return NintendoNetworkErrorXML{}, err
 
 	}
 
-	// return the parsed xml
 	return errorXMLParsed, nil
 
 }
 
-/*
-
-NewNintendoNetworkClient is a constructor function for creating a client to nintendo network servers
-
-*/
+// NewNintendoNetworkClient is a constructor function for creating a client to nintendo network servers
 func NewNintendoNetworkClient(accountServer string, certificatePath string, keyPath string, nnClientInfo NintendoNetworkClientInformation) (NintendoNetworkClient, error) {
 
-	// load the certificate and key
 	keyPair, err := tls.LoadX509KeyPair(certificatePath, keyPath)
-
-	// handle errors
 	if err != nil {
 
-		// if there is one, return it
 		return NintendoNetworkClient{}, err
 
 	}
 
-	// then we create a *http.Client with tls
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -113,26 +95,19 @@ func NewNintendoNetworkClient(accountServer string, certificatePath string, keyP
 		},
 	}
 
-	// then create a NintendoNetworkClient
 	nnClient := NintendoNetworkClient{
 		AccountServerAPIEndpoint: accountServer,
 		HTTPClient:               httpClient,
 		ClientInformation:        nnClientInfo,
 	}
 
-	// and then return it
 	return nnClient, nil
 
 }
 
-/*
-
-Do is a method on NintendoNetworkClient that makes a request to any url with the nintendo network headers and clientcert
-
-*/
+// Do is a method on NintendoNetworkClient that makes a request to any url with the nintendo network headers and clientcert
 func (c NintendoNetworkClient) Do(request *http.Request) (*http.Response, error) {
 
-	// set some headers
 	request.Header.Set("X-Nintendo-Client-ID", c.ClientInformation.ClientID)
 	request.Header.Set("X-Nintendo-Client-Secret", c.ClientInformation.ClientSecret)
 	request.Header.Set("X-Nintendo-Platform-ID", c.ClientInformation.PlatformID)
@@ -144,92 +119,58 @@ func (c NintendoNetworkClient) Do(request *http.Request) (*http.Response, error)
 	request.Header.Set("X-Nintendo-Country", c.ClientInformation.Country)
 	request.Header.Set("X-Nintendo-Environment", c.ClientInformation.Environment)
 	request.Header.Set("X-Nintendo-Device-Cert", c.ClientInformation.DeviceCert)
-
-	// do the request
 	return c.HTTPClient.Do(request)
 
 }
 
-/*
-
-DoesUserExist is a method on NintendoNetworkClient that requests info about a user from the nintendo network servers
-
-*/
+// DoesUserExist is a method on NintendoNetworkClient that requests info about a user from the nintendo network servers
 func (c NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetworkErrorXML, error) {
 
-	// construct the request
 	request, err := http.NewRequest("GET", strings.Join([]string{c.AccountServerAPIEndpoint, "/people/", nnid}, ""), nil)
-
-	// check if there was an error
 	if err != nil {
 
-		// if there was one, we return it
 		return false, NintendoNetworkErrorXML{}, err
 
 	}
 
-	// set the headers
-	request.Header.Set("X-Nintendo-Client-ID", c.ClientInformation.ClientID)
-	request.Header.Set("X-Nintendo-Client-Secret", c.ClientInformation.ClientSecret)
-
-	// perform the request
 	res, err := c.HTTPClient.Do(request)
-
-	// check if there was an error
 	if err != nil {
 
-		// if there was one, we return it
 		return false, NintendoNetworkErrorXML{}, err
 
 	}
 
-	// close the response body when we are done
 	defer res.Body.Close()
 
-	// get the response body
 	resData, err := ioutil.ReadAll(res.Body)
-
-	// check if there were errors
 	if err != nil {
 
-		// return an error if there was one
 		return false, NintendoNetworkErrorXML{}, err
 
 	}
 
-	// the error xml struct
 	var errorXML NintendoNetworkErrorXML
 
-	// attempt to parse it as xml
 	err = xml.Unmarshal(resData, &errorXML)
-
-	// check an error occured
 	if err != nil {
 
-		// return the error
 		return false, NintendoNetworkErrorXML{}, err
 
 	}
 
-	// we check the error code
-	if errorXML.Code == 100 {
+	switch errorXML.Code {
 
-		// it exists
+	case 100:
 		return true, errorXML, nil
 
-	} else if errorXML.Code == 1104 {
-
-		// user id format invalid
+	case 1104:
 		return false, errorXML, errors.New("your user id format is invalid")
 
-	} else if errorXML.Code == 4 {
-
-		// invalid creds
+	case 4:
 		return false, errorXML, errors.New("there is an error in your credentials")
 
 	}
 
-	// if we get here, there was an unknown error
 	return false, errorXML, errors.New("an unknown and unhandlable error occured")
 
 }

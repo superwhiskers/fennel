@@ -1,7 +1,20 @@
 /*
 
-parampack.go -
-contains things for handling parampacks
+libninty - nintendo network utility library for golang
+Copyright (C) 2018 superwhiskers <whiskerdev@protonmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
@@ -15,11 +28,7 @@ import (
 	"unicode"
 )
 
-/*
-
-Parampack implements a struct for containing data housed in nintendo parampacks in a golang-compatible format
-
-*/
+// Parampack implements a struct for containing data housed in nintendo parampacks in a golang-compatible format
 type Parampack struct {
 	TitleID            string
 	AccessKey          string
@@ -38,11 +47,7 @@ type Parampack struct {
 	RemasterVersion    int
 }
 
-/*
-
-NilParampack is a parampack type that contains no data
-
-*/
+// NilParampack is a parampack type that contains no data
 var NilParampack = Parampack{
 	TitleID:            "0000000000000000",
 	AccessKey:          "",
@@ -61,62 +66,44 @@ var NilParampack = Parampack{
 	RemasterVersion:    0,
 }
 
-/*
-
-StringifyParampack is a method of the Parampack type that returns a stringified version of the parampack
-
-*/
+// StringifyParampack is a method of the Parampack type that returns a stringified version of the parampack
 func (p Parampack) StringifyParampack() string {
 
-	// it's just return the stringified version of the parampack
 	return fmt.Sprintf("\\title_id\\%s\\access_key\\%s\\platform_id\\%d\\region_id\\%d\\language_id\\%d\\country_id\\%d\\area_id\\%d\\network_restriction\\%d\\friend_restriction\\%d\\rating_restriction\\%d\\rating_organization\\%d\\transferable_id\\%s\\tz_name\\%s\\utc_offset\\%d\\remaster_version\\%d\\", p.TitleID, p.AccessKey, p.PlatformID, p.RegionID, p.LanguageID, p.CountryID, p.AreaID, p.NetworkRestriction, p.FriendRestriction, p.RatingRestriction, p.RatingOrganization, p.TransferableID, p.TimezoneName, p.UTCOffset, p.RemasterVersion)
 
 }
 
-/*
-
-EncodeParampack is a method of the Parampack type that encodes a stringified parampack into base64
-
-*/
+// EncodeParampack is a method of the Parampack type that encodes a stringified parampack into base64
 func (p Parampack) EncodeParampack() string {
 
-	// convert the stringified parampack to base64
 	return base64.StdEncoding.EncodeToString([]byte(p.StringifyParampack()))
 
 }
 
-/*
-
-UnstringifyParampack takes a stringified parampack and places it into a struct
-
-*/
+// UnstringifyParampack takes a stringified parampack and places it into a struct
 func UnstringifyParampack(parampack string) Parampack {
 
-	// split it by backslashes
-	splitParampack := strings.Split(parampack, "\\")
+	var (
+		splitParampack     = strings.Split(parampack, "\\")
+		titleID            = "0000000000000000"
+		accessKey          = ""
+		platformID         = 0
+		regionID           = 0
+		languageID         = 0
+		countryID          = 0
+		areaID             = 0
+		networkRestriction = 0
+		friendRestriction  = 0
+		ratingRestriction  = 0
+		ratingOrganization = 0
+		transferableID     = ""
+		timezoneName       = ""
+		utcOffset          = 0
+		remasterVersion    = 0
+	)
 
-	// variables to be placed into the struct
-	titleID := "0000000000000000"
-	accessKey := ""
-	platformID := 0
-	regionID := 0
-	languageID := 0
-	countryID := 0
-	areaID := 0
-	networkRestriction := 0
-	friendRestriction := 0
-	ratingRestriction := 0
-	ratingOrganization := 0
-	transferableID := ""
-	timezoneName := ""
-	utcOffset := 0
-	remasterVersion := 0
-
-	// iterate over the split parampack
 	for ind, ele := range splitParampack {
 
-		// check if it is one of the parts of a parameter pack
-		// and assign its value to the corresponding variable
 		switch ele {
 
 		case "title_id":
@@ -220,7 +207,6 @@ func UnstringifyParampack(parampack string) Parampack {
 
 	}
 
-	// finally, formulate a parampack struct
 	returnableParampack := Parampack{
 		TitleID:            titleID,
 		AccessKey:          accessKey,
@@ -243,14 +229,9 @@ func UnstringifyParampack(parampack string) Parampack {
 
 }
 
-/*
-
-DecodeParampack takes a base64ed parampack and decodes it into a struct
-
-*/
+// DecodeParampack takes a base64ed parampack and decodes it into a struct
 func DecodeParampack(parampack string) (Parampack, error) {
 
-	// strip spaces
 	paramStripped := strings.Map(func(r rune) rune {
 		if unicode.IsSpace(r) {
 			return -1
@@ -258,18 +239,13 @@ func DecodeParampack(parampack string) (Parampack, error) {
 		return r
 	}, parampack)
 
-	// decode it from base64
 	decodedParampack, err := base64.StdEncoding.DecodeString(paramStripped)
-
-	// if there is an error
 	if err != nil {
 
-		// exit the function and return the error
 		return NilParampack, err
 
 	}
 
-	// and return it
 	return UnstringifyParampack(string(decodedParampack[:])), nil
 
 }

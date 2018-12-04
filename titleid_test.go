@@ -1,34 +1,45 @@
+/*
+
+libninty - nintendo network utility library for golang
+Copyright (C) 2018 superwhiskers <whiskerdev@protonmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+*/
+
 package libninty
 
 import "testing"
 
 func TestUnstringifyWiiUTID(t *testing.T) {
 
-	// define a test titleid
 	stringifiedTitleID := "1407443871727872"
-
-	// define the expected output
 	expectedOutput := "0005001010040100"
 
-	// see if it decodes
 	output, err := UnstringifyWiiUTID(stringifiedTitleID)
 
-	// test failed if an error occured
 	if err != nil {
 
-		// fail the test
 		t.Errorf("expected no error to occur, instead got %v\n", err)
 
 	}
 
-	// print what we got vs what we expected
 	t.Logf("expected: %s", expectedOutput)
 	t.Logf("got: %s", output)
 
-	// compare the expected output with the output
 	if output != expectedOutput {
 
-		// if they do not match, fail
 		t.Errorf("output mismatch...")
 
 	}

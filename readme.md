@@ -1,6 +1,6 @@
 # libninty
 
-## a golang library to make dealing with nintendo data easier
+## nintendo network utility library for golang  
 
 [![GoDoc](https://godoc.org/gitlab.com/superwhiskers/libninty?status.svg)](https://godoc.org/gitlab.com/superwhiskers/libninty)
 
