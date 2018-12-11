@@ -95,7 +95,7 @@ func TestNewNintendoNetworkClient(t *testing.T) {
 func TestDoesUserExist(t *testing.T) {
 
 	nnClientInfo := NintendoNetworkClientInformation{
-		ClientID:     "ea25c66c26b403376b4c5ed94ab9cdea",
+		ClientID:     "ea25c66c26b403376b4c5ed94ab9cdea-aa",
 		ClientSecret: "d137be62cb6a2b831cad8c013b92fb55",
 		DeviceCert:   "",
 		Environment:  "",

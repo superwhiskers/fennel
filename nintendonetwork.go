@@ -23,7 +23,6 @@ package libninty
 import (
 	"crypto/tls"
 	"encoding/xml"
-	"errors"
 	"strings"
 
 	"github.com/valyala/fasthttp"
@@ -145,6 +144,12 @@ func (c *NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetwor
 
 	}
 
+	if response.StatusCode() == 200 {
+
+		return false, NintendoNetworkErrorXML{}, nil
+
+	}
+
 	var errorXML NintendoNetworkErrorXML
 
 	err = xml.Unmarshal(response.Body(), &errorXML)
@@ -156,18 +161,18 @@ func (c *NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetwor
 
 	switch errorXML.Code {
 
-	case 100:
-		return true, errorXML, nil
+	case AccountIDExistsError.Code:
+		return true, errorXML, AccountIDExistsError
 
-	case 1104:
-		return false, errorXML, errors.New("your user id format is invalid")
+	case InvalidAccountIDError.Code:
+		return false, errorXML, InvalidAccountIDError
 
-	case 4:
-		return false, errorXML, errors.New("there is an error in your credentials")
+	case InvalidApplicationError.Code:
+		return false, errorXML, InvalidApplicationError
 
 	}
 
-	return false, errorXML, errors.New("an unknown and unhandlable error occured")
+	return false, errorXML, UnknownError
 
 }
 
