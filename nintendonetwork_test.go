@@ -21,27 +21,28 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package libninty
 
 import (
+	"bytes"
 	"crypto/tls"
 	"testing"
 
 	"github.com/valyala/fasthttp"
 )
 
-func TestNewNintendoNetworkClient(t *testing.T) {
+var nnClientInfo = NintendoNetworkClientInformation{
+	ClientID:     "ea25c66c26b403376b4c5ed94ab9cdea",
+	ClientSecret: "d137be62cb6a2b831cad8c013b92fb55",
+	DeviceCert:   "",
+	Environment:  "",
+	Country:      "US",
+	Region:       "2",
+	SysVersion:   "1111",
+	Serial:       "1",
+	DeviceID:     "1",
+	DeviceType:   "",
+	PlatformID:   "1",
+}
 
-	nnClientInfo := NintendoNetworkClientInformation{
-		ClientID:     "ea25c66c26b403376b4c5ed94ab9cdea",
-		ClientSecret: "d137be62cb6a2b831cad8c013b92fb55",
-		DeviceCert:   "",
-		Environment:  "",
-		Country:      "",
-		Region:       "",
-		SysVersion:   "",
-		Serial:       "",
-		DeviceID:     "",
-		DeviceType:   "",
-		PlatformID:   "",
-	}
+func TestNewNintendoNetworkClient(t *testing.T) {
 
 	keyPair, err := tls.LoadX509KeyPair("keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem")
 	if err != nil {
@@ -94,20 +95,6 @@ func TestNewNintendoNetworkClient(t *testing.T) {
 
 func TestDoesUserExist(t *testing.T) {
 
-	nnClientInfo := NintendoNetworkClientInformation{
-		ClientID:     "ea25c66c26b403376b4c5ed94ab9cdea-aa",
-		ClientSecret: "d137be62cb6a2b831cad8c013b92fb55",
-		DeviceCert:   "",
-		Environment:  "",
-		Country:      "",
-		Region:       "",
-		SysVersion:   "",
-		Serial:       "",
-		DeviceID:     "",
-		DeviceType:   "",
-		PlatformID:   "",
-	}
-
 	client, err := NewNintendoNetworkClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", nnClientInfo)
 	if err != nil {
 
@@ -127,6 +114,37 @@ func TestDoesUserExist(t *testing.T) {
 	t.Logf("got: %+v", output)
 
 	if output != true {
+
+		t.Errorf("output mismatch...")
+
+	}
+
+}
+
+func TestGetEULA(t *testing.T) {
+
+	eulaXML := []byte{}
+
+	client, err := NewNintendoNetworkClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", nnClientInfo)
+	if err != nil {
+
+		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	output, xml, err := client.GetEULA("US", "@latest")
+	if err != nil {
+
+		t.Logf("error xml: %#v\n", xml)
+		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	// TODO: make the test validate it against the proposed struct for this
+	t.Logf("expected: []byte{}")
+	t.Logf("got: %+v", output)
+
+	if !bytes.Equal(output, eulaXML) {
 
 		t.Errorf("output mismatch...")
 

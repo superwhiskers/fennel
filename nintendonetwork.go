@@ -162,7 +162,7 @@ func (c *NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetwor
 	switch errorXML.Code {
 
 	case AccountIDExistsError.Code:
-		return true, errorXML, AccountIDExistsError
+		return true, errorXML, nil
 
 	case InvalidAccountIDError.Code:
 		return false, errorXML, InvalidAccountIDError
@@ -177,8 +177,57 @@ func (c *NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetwor
 }
 
 // GetEULA retrieves the Nintendo Network EULA for the specified country
-func (c *NintendoNetworkClient) GetEULA(country string) ([]byte, NintendoNetworkErrorXML, error) {
+// if version is `@latest`, it returns the latest version. otherwise, it returns the specified version
+func (c *NintendoNetworkClient) GetEULA(countryCode, version string) ([]byte, NintendoNetworkErrorXML, error) {
 
-	return []byte{}, NintendoNetworkErrorXML{}, nil
+	request := fasthttp.AcquireRequest()
+	response := fasthttp.AcquireResponse()
+	requestHeader := fasthttp.RequestHeader{}
+
+	defer fasthttp.ReleaseRequest(request)
+	defer fasthttp.ReleaseResponse(response)
+
+	requestHeader.SetMethod("GET")
+	request.Header = requestHeader
+	request.SetRequestURI(strings.Join([]string{c.AccountServerAPIEndpoint, "/content/agreements/Nintendo-Network-EULA/", countryCode, "/", version}, ""))
+
+	err := c.Do(request, response)
+	if err != nil {
+
+		return []byte{}, NintendoNetworkErrorXML{}, err
+
+	}
+
+	if response.StatusCode() == 200 {
+
+		// TOOD: actually parse agreement xml here
+		// TOOD: make type for agreement xml
+		return []byte{}, NintendoNetworkErrorXML{}, nil
+
+	}
+
+	var errorXML NintendoNetworkErrorXML
+
+	err = xml.Unmarshal(response.Body(), &errorXML)
+	if err != nil {
+
+		return []byte{}, NintendoNetworkErrorXML{}, err
+
+	}
+
+	switch errorXML.Code {
+
+	case InvalidParameterError.Code:
+		return []byte{}, errorXML, InvalidParameterError
+
+	case InvalidApplicationError.Code:
+		return []byte{}, errorXML, InvalidApplicationError
+
+	case InvalidVersionError.Code:
+		return []byte{}, errorXML, InvalidVersionError
+
+	}
+
+	return []byte{}, errorXML, UnknownError
 
 }

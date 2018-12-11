@@ -47,11 +47,22 @@ var (
 	}
 	InvalidApplicationError = &NintendoNetworkError{
 		Code:    4,
-		Message: "invalid application credentials were provided",
+		Message: "invalid application credentials were provided in the request",
 	}
 	InvalidAccountIDError = &NintendoNetworkError{
 		Code:    1104,
-		Message: "an invalid account id was provided",
+		Message: "an invalid account id was provided in the request",
+	}
+
+	// TODO: check if this error is used in other places and change that to match it
+	InvalidVersionError = &NintendoNetworkError{
+		Code:    1101,
+		Message: "an invalid version was provided in the request",
+	}
+
+	InvalidParameterError = &NintendoNetworkError{
+		Code:    2,
+		Message: "an invalid parameter was provided in the request",
 	}
 
 	UnknownError = &NintendoNetworkError{
