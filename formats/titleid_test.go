@@ -44,7 +44,7 @@ func TestTitleID(t *testing.T) {
 
 	t.Logf("got TitleID: %#v\n", tid)
 
-	wiiuTID, err := tid.FormatWiiU()
+	wiiuTID, err := expectedTID.FormatWiiU()
 	if err != nil {
 
 		t.Errorf("couldn't convert the TitleID back to a wiiu titleid. error: %v\n", err)

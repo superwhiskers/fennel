@@ -26,15 +26,23 @@ import (
 
 // ErrorXML represents a nintendo network error xml sheet
 type ErrorXML struct {
-	XMLName xml.Name `xml:"errors"`
-	Errors []ErrorXMLError `xml:"error"`
+	XMLName xml.Name        `xml:"errors"`
+	Errors  []ErrorXMLError `xml:"error"`
 }
 
 // ErrorXMLError represents an error of an ErrorXML
 type ErrorXMLError struct {
-	Cause string `xml:"cause"`
-	Code  string `xml:"code"`
+	Cause   string `xml:"cause"`
+	Code    string `xml:"code"`
 	Message string `xml:"message"`
+}
+
+// FormatXML formats an ErrorXML struct as a byte array
+func (eXML ErrorXML) FormatXML() ([]byte, error) {
+
+	errorxml, err := xml.Marshal(eXML)
+	return errorxml, err
+
 }
 
 // ParseErrorXML parses a nintendo network error xml sheet to an ErrorXML struct
@@ -50,13 +58,5 @@ func ParseErrorXML(errorXML []byte) (ErrorXML, error) {
 	}
 
 	return errorXMLParsed, nil
-
-}
-
-// FormatXML formats an ErrorXML struct as a nintendo network error xml sheet
-func (eXML ErrorXML) FormatXML() ([]byte, error) {
-
-	errorxml, err := xml.Marshal(eXML)
-	return errorxml, err
 
 }

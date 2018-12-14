@@ -21,8 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package formats
 
 import (
-	"testing"
 	"bytes"
+	"testing"
 )
 
 func TestErrorXML(t *testing.T) {
@@ -30,9 +30,9 @@ func TestErrorXML(t *testing.T) {
 	var (
 		expectedErrorXML = ErrorXML{
 			Errors: []ErrorXMLError{
-				ErrorXMLError{
-					Cause: "client_id",
-					Code: "0004",
+				{
+					Cause:   "client_id",
+					Code:    "0004",
 					Message: "API application invalid or incorrect application credentials",
 				},
 			},
@@ -59,7 +59,7 @@ func TestErrorXML(t *testing.T) {
 
 	t.Logf("got ErrorXML: %#v\n", errorxml)
 
-	errorXMLByte, err := errorxml.FormatXML()
+	errorXMLByte, err := expectedErrorXML.FormatXML()
 	if err != nil {
 
 		t.Errorf("couldn't format the ErrorXML as an errorxml. error: %v\n", err)

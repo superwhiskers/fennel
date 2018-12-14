@@ -25,7 +25,7 @@ import "testing"
 func TestParampack(t *testing.T) {
 
 	var (
-		expectedB64Parampack = "XHRpdGxlX2lkXFxhY2Nlc3Nfa2V5XDBccGxhdGZvcm1faWRcMVxyZWdpb25faWRcMlxsYW5ndWFnZV9pZFwxXGNvdW50cnlfaWRcNDlcYXJlYV9pZFwwXG5ldHdvcmtfcmVzdHJpY3Rpb25cMFxmcmllbmRfcmVzdHJpY3Rpb25cMFxyYXRpbmdfcmVzdHJpY3Rpb25cMjBccmF0aW5nX29yZ2FuaXphdGlvblwwXHRyYW5zZmVyYWJsZV9pZFwxMjc1NjE0NDg4NDQ1Mzg5ODc4Mlx0el9uYW1lXEFtZXJpY2EvTmV3X1lvcmtcdXRjX29mZnNldFwtMTQ0MDBccmVtYXN0ZXJfdmVyc2lvblwwXA=="
+		expectedB64Parampack    = "XHRpdGxlX2lkXFxhY2Nlc3Nfa2V5XDBccGxhdGZvcm1faWRcMVxyZWdpb25faWRcMlxsYW5ndWFnZV9pZFwxXGNvdW50cnlfaWRcNDlcYXJlYV9pZFwwXG5ldHdvcmtfcmVzdHJpY3Rpb25cMFxmcmllbmRfcmVzdHJpY3Rpb25cMFxyYXRpbmdfcmVzdHJpY3Rpb25cMjBccmF0aW5nX29yZ2FuaXphdGlvblwwXHRyYW5zZmVyYWJsZV9pZFwxMjc1NjE0NDg4NDQ1Mzg5ODc4Mlx0el9uYW1lXEFtZXJpY2EvTmV3X1lvcmtcdXRjX29mZnNldFwtMTQ0MDBccmVtYXN0ZXJfdmVyc2lvblwwXA=="
 		expectedStringParampack = "\\title_id\\\\access_key\\0\\platform_id\\1\\region_id\\2\\language_id\\1\\country_id\\49\\area_id\\0\\network_restriction\\0\\friend_restriction\\0\\rating_restriction\\20\\rating_organization\\0\\transferable_id\\12756144884453898782\\tz_name\\America/New_York\\utc_offset\\-14400\\remaster_version\\0\\"
 		expectedParampack       = Parampack{
 			TitleID:            "",
@@ -71,7 +71,7 @@ func TestParampack(t *testing.T) {
 
 	t.Logf("got Parampack: %#v\n", parampack)
 
-	encodedParampack := parampack.FormatSource()
+	encodedParampack := expectedParampack.FormatSource()
 
 	if encodedParampack != expectedB64Parampack {
 
@@ -81,7 +81,7 @@ func TestParampack(t *testing.T) {
 
 	t.Logf("got b64 parampack: %s\n", encodedParampack)
 
-	encodedParampack = parampack.FormatString()
+	encodedParampack = expectedParampack.FormatString()
 
 	if encodedParampack != expectedStringParampack {
 
