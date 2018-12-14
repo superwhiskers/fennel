@@ -18,32 +18,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
+// Package libninty implements a nintendo network api client in go
 package libninty
-
-import "strconv"
-
-// UnstringifyWiiUTID converts an encoded wiiu titleid into a proper one
-func UnstringifyWiiUTID(stringifiedTID string) (string, error) {
-
-	intTID, err := strconv.ParseUint(stringifiedTID, 10, 64)
-	if err != nil {
-
-		return "", err
-
-	}
-
-	tid := strconv.FormatUint(intTID, 16)
-
-	if len(tid) != 16 {
-
-		for x := len(tid); x < 16; x++ {
-
-			tid = "0" + tid
-
-		}
-
-	}
-
-	return tid, nil
-
-}

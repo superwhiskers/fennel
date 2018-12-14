@@ -23,6 +23,7 @@ package libninty
 import (
 	"bytes"
 	"crypto/tls"
+	"io/ioutil"
 	"testing"
 
 	"github.com/valyala/fasthttp"
@@ -82,12 +83,9 @@ func TestNewNintendoNetworkClient(t *testing.T) {
 
 	}
 
-	t.Logf("expected: %+v", expectedOutput)
-	t.Logf("got: %+v", output)
-
 	if output == expectedOutput {
 
-		t.Errorf("output mismatch...")
+		t.Errorf("invalid output")
 
 	}
 
@@ -102,20 +100,16 @@ func TestDoesUserExist(t *testing.T) {
 
 	}
 
-	output, xml, err := client.DoesUserExist("whiskers")
+	output, _, err := client.DoesUserExist("whiskers")
 	if err != nil {
 
-		t.Logf("error xml: %#v\n", xml)
 		t.Errorf("expected no error to occur, instead got %v\n", err)
 
 	}
 
-	t.Logf("expected: true")
-	t.Logf("got: %+v", output)
-
 	if output != true {
 
-		t.Errorf("output mismatch...")
+		t.Errorf("invalid output")
 
 	}
 
@@ -132,21 +126,24 @@ func TestGetEULA(t *testing.T) {
 
 	}
 
-	output, xml, err := client.GetEULA("US", "@latest")
+	output, _, err := client.GetEULA("US", "@latest")
 	if err != nil {
 
-		t.Logf("error xml: %#v\n", xml)
 		t.Errorf("expected no error to occur, instead got %v\n", err)
 
 	}
 
-	// TODO: make the test validate it against the proposed struct for this
-	t.Logf("expected: []byte{}")
-	t.Logf("got: %+v", output)
+	err = ioutil.WriteFile("eula.xml", output, 0644)
+	if err != nil {
 
+		t.Errorf("unable to write the eula to the file. error: %v\n", err)
+
+	}
+
+	// TODO: make the test validate it against the proposed struct for this
 	if !bytes.Equal(output, eulaXML) {
 
-		t.Errorf("output mismatch...")
+		t.Errorf("invalid output")
 
 	}
 

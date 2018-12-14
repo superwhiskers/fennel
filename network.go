@@ -22,22 +22,13 @@ package libninty
 
 import (
 	"crypto/tls"
-	"encoding/xml"
 	"strings"
 
 	"github.com/valyala/fasthttp"
 )
 
-// NintendoNetworkErrorXML is a struct that holds information from a nintendo network error xml
-type NintendoNetworkErrorXML struct {
-	XMLName xml.Name `xml:"errors"`
-	Cause   string   `xml:"error>cause"`
-	Code    int      `xml:"error>code"`
-	Message string   `xml:"error>message"`
-}
-
-// NintendoNetworkClientInformation is a struct that holds data that is used to make the servers believe we are an actual 3ds or wiiu
-type NintendoNetworkClientInformation struct {
+// ClientInformation holds data for headers sent in requests to nintendo network
+type ClientInformation struct {
 	ClientID     string
 	ClientSecret string
 	DeviceCert   string
@@ -51,27 +42,11 @@ type NintendoNetworkClientInformation struct {
 	PlatformID   string
 }
 
-// NintendoNetworkClient is a struct that holds data used for connecting to nintendo network servers
-type NintendoNetworkClient struct {
+// Client implements a client for nintendo network
+type Client struct {
 	AccountServerAPIEndpoint string
 	HTTPClient               *fasthttp.Client
 	ClientInformation        NintendoNetworkClientInformation
-}
-
-// ParseErrorXML is a function that parses error xml and returns a NintendoNetworkErrorXML struct
-func ParseErrorXML(errorXML []byte) (NintendoNetworkErrorXML, error) {
-
-	var errorXMLParsed NintendoNetworkErrorXML
-
-	err := xml.Unmarshal(errorXML, &errorXMLParsed)
-	if err != nil {
-
-		return NintendoNetworkErrorXML{}, err
-
-	}
-
-	return errorXMLParsed, nil
-
 }
 
 // NewNintendoNetworkClient is a constructor function for creating a client to nintendo network servers
@@ -202,7 +177,7 @@ func (c *NintendoNetworkClient) GetEULA(countryCode, version string) ([]byte, Ni
 
 		// TOOD: actually parse agreement xml here
 		// TOOD: make type for agreement xml
-		return []byte{}, NintendoNetworkErrorXML{}, nil
+		return response.Body(), NintendoNetworkErrorXML{}, nil
 
 	}
 

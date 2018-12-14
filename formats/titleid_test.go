@@ -18,30 +18,45 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
-package libninty
+package formats
 
 import "testing"
 
-func TestUnstringifyWiiUTID(t *testing.T) {
+func TestTitleID(t *testing.T) {
 
-	stringifiedTitleID := "1407443871727872"
-	expectedOutput := "0005001010040100"
+	var (
+		expectedWiiUTID = "1407443871727872"
+		expectedTID     = TitleID{'0', '0', '0', '5', '0', '0', '1', '0', '1', '0', '0', '4', '0', '1', '0', '0'}
+	)
 
-	output, err := UnstringifyWiiUTID(stringifiedTitleID)
-
+	tid, err := ParseWiiUTID(expectedWiiUTID)
 	if err != nil {
 
-		t.Errorf("expected no error to occur, instead got %v\n", err)
+		t.Errorf("couldn't parse the wiiu titleid to a TitleID. error: %v\n", err)
 
 	}
 
-	t.Logf("expected: %s", expectedOutput)
-	t.Logf("got: %s", output)
+	if tid != expectedTID {
 
-	if output != expectedOutput {
-
-		t.Errorf("output mismatch...")
+		t.Errorf("the TitleID doesn't match the expected one")
 
 	}
+
+	t.Logf("got TitleID: %#v\n", tid)
+
+	wiiuTID, err := tid.FormatWiiU()
+	if err != nil {
+
+		t.Errorf("couldn't convert the TitleID back to a wiiu titleid. error: %v\n", err)
+
+	}
+
+	if wiiuTID != expectedWiiUTID {
+
+		t.Errorf("the wiiu titleid doesn't match the expected one")
+
+	}
+
+	t.Logf("got wiiu tid: %#v\n", wiiuTID)
 
 }

@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
-package libninty
+package formats
 
 import (
 	"encoding/base64"
@@ -28,7 +28,7 @@ import (
 	"unicode"
 )
 
-// Parampack implements a struct for containing data housed in nintendo parampacks in a golang-compatible format
+// Parampack is a data structure that represents a nintendo parampack
 type Parampack struct {
 	TitleID            string
 	AccessKey          string
@@ -47,7 +47,7 @@ type Parampack struct {
 	RemasterVersion    int
 }
 
-// NilParampack is a parampack type that contains no data
+// NilParampack is a Parampack with no data
 var NilParampack = Parampack{
 	TitleID:            "0000000000000000",
 	AccessKey:          "",
@@ -66,22 +66,22 @@ var NilParampack = Parampack{
 	RemasterVersion:    0,
 }
 
-// StringifyParampack is a method of the Parampack type that returns a stringified version of the parampack
-func (p Parampack) StringifyParampack() string {
+// FormatString formats the Parampack as a string
+func (p Parampack) FormatString() string {
 
 	return fmt.Sprintf("\\title_id\\%s\\access_key\\%s\\platform_id\\%d\\region_id\\%d\\language_id\\%d\\country_id\\%d\\area_id\\%d\\network_restriction\\%d\\friend_restriction\\%d\\rating_restriction\\%d\\rating_organization\\%d\\transferable_id\\%s\\tz_name\\%s\\utc_offset\\%d\\remaster_version\\%d\\", p.TitleID, p.AccessKey, p.PlatformID, p.RegionID, p.LanguageID, p.CountryID, p.AreaID, p.NetworkRestriction, p.FriendRestriction, p.RatingRestriction, p.RatingOrganization, p.TransferableID, p.TimezoneName, p.UTCOffset, p.RemasterVersion)
 
 }
 
-// EncodeParampack is a method of the Parampack type that encodes a stringified parampack into base64
-func (p Parampack) EncodeParampack() string {
+// FormatSource formats the Parampack in the source format
+func (p Parampack) FormatSource() string {
 
-	return base64.StdEncoding.EncodeToString([]byte(p.StringifyParampack()))
+	return base64.StdEncoding.EncodeToString([]byte(p.FormatString()))
 
 }
 
-// UnstringifyParampack takes a stringified parampack and places it into a struct
-func UnstringifyParampack(parampack string) Parampack {
+// ParseStringParampack takes a parampack as a string and parses it to a Parampack
+func ParseStringParampack(parampack string) Parampack {
 
 	var (
 		splitParampack     = strings.Split(parampack, "\\")
@@ -108,6 +108,7 @@ func UnstringifyParampack(parampack string) Parampack {
 
 		case "title_id":
 
+			// TODO: add a 3ds tid unstringifier
 			// titleids are special
 			/*
 				unstringifiedTID, err := unstringifyTID(splitParampack[ind+1])
@@ -229,8 +230,8 @@ func UnstringifyParampack(parampack string) Parampack {
 
 }
 
-// DecodeParampack takes a base64ed parampack and decodes it into a struct
-func DecodeParampack(parampack string) (Parampack, error) {
+// ParseParampack takes a parampack in the source format and parses it to a Parampack
+func ParseParampack(parampack string) (Parampack, error) {
 
 	paramStripped := strings.Map(func(r rune) rune {
 		if unicode.IsSpace(r) {
@@ -246,6 +247,6 @@ func DecodeParampack(parampack string) (Parampack, error) {
 
 	}
 
-	return UnstringifyParampack(string(decodedParampack[:])), nil
+	return ParseStringParampack(string(decodedParampack[:])), nil
 
 }

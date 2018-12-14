@@ -19,22 +19,3 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 package libninty
-
-import (
-	"encoding/base64"
-	"encoding/hex"
-)
-
-// DecodeServiceToken is a function that takes a base64ed servicetoken and converts it to hexadecimal
-func DecodeServiceToken(serviceToken string) (string, error) {
-
-	decodedServiceToken, err := base64.StdEncoding.DecodeString(serviceToken)
-	if err != nil {
-
-		return "", err
-
-	}
-
-	return hex.EncodeToString(decodedServiceToken), nil
-
-}

@@ -1,0 +1,75 @@
+/*
+
+libninty - nintendo network utility library for golang
+Copyright (C) 2018 superwhiskers <whiskerdev@protonmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+*/
+
+package errors
+
+import "fmt"
+
+// AccountServerError implements an error type for errors returned from the account server
+type AccountServerError struct {
+	Code    int
+	Message string
+}
+
+// Error returns a stringified version of the error from AccountServerError
+func (err *AccountServerError) Error() string {
+
+	return fmt.Sprintf("error code %d: %s", err.Code, err.Message)
+
+}
+
+// error declarations. do not edit these
+var (
+	BadRequestError = &AccountServerError{
+		Code:    1600,
+		Message: "unable to process request",
+	}
+	AccountIDExistsError = &AccountServerError{
+		Code:    100,
+		Message: "account id already exists",
+	}
+	InvalidApplicationError = &AccountServerError{
+		Code:    4,
+		Message: "invalid application credentials were provided in the request",
+	}
+	InvalidAccountIDError = &AccountServerError{
+		Code:    1104,
+		Message: "an invalid account id was provided in the request",
+	}
+
+	// TODO: check if this error is used in other places and change that to match it
+	InvalidVersionError = &AccountServerError{
+		Code:    1101,
+		Message: "an invalid version was provided in the request",
+	}
+
+	InvalidParameterError = &AccountServerError{
+		Code:    2,
+		Message: "an invalid parameter was provided in the request",
+	}
+
+	UnknownError = &AccountServerError{
+		Code:    -1,
+		Message: "an unknown error was returned from the server",
+	}
+
+	// error code lookup table
+	ErrorCodeToError = []*AccountServerError{}
+)
