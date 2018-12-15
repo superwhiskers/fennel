@@ -31,6 +31,14 @@ type AgreementXML struct {
 	Agreements []AgreementXMLAgreement `xml:"agreement"`
 }
 
+// FormatXML formats the AgreementXML as a byte array
+func (a AgreementXML) FormatXML() ([]byte, error) {
+
+	agreementxml, err := xml.Marshal(a)
+	return agreementxml, err
+
+}
+
 // AgreementXMLAgreement represents an agreement of an AgreementXML
 type AgreementXMLAgreement struct {
 	Country        string `xml:"country"`
@@ -45,25 +53,17 @@ type AgreementXMLAgreement struct {
 	Version        string `xml:"version"`
 }
 
-// CData represents cdata in xml
-type CData struct {
-	Data string `xml:",cdata"`
-}
-
 // PublishDate returns the publish date as time.Time
-func (aXMLAgreement AgreementXMLAgreement) PublishDate() (time.Time, error) {
+func (a AgreementXMLAgreement) PublishDate() (time.Time, error) {
 
-	time, err := time.Parse(time.RFC3339, aXMLAgreement.PublishDateRaw)
+	time, err := time.Parse(time.RFC3339, a.PublishDateRaw)
 	return time, err
 
 }
 
-// FormatXML formats the AgreementXML as a byte array
-func (aXML AgreementXML) FormatXML() ([]byte, error) {
-
-	agreementxml, err := xml.Marshal(aXML)
-	return agreementxml, err
-
+// CData represents cdata in xml
+type CData struct {
+	Data string `xml:",cdata"`
 }
 
 // ParseAgreementXML parses a nintendo network agreement xml to an AgreementXML

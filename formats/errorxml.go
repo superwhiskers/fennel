@@ -22,12 +22,21 @@ package formats
 
 import (
 	"encoding/xml"
+	"fmt"
 )
 
 // ErrorXML represents a nintendo network error xml sheet
 type ErrorXML struct {
 	XMLName xml.Name        `xml:"errors"`
 	Errors  []ErrorXMLError `xml:"error"`
+}
+
+// FormatXML formats an ErrorXML struct as a byte array
+func (e ErrorXML) FormatXML() ([]byte, error) {
+
+	errorxml, err := xml.Marshal(e)
+	return errorxml, err
+
 }
 
 // ErrorXMLError represents an error of an ErrorXML
@@ -37,11 +46,10 @@ type ErrorXMLError struct {
 	Message string `xml:"message"`
 }
 
-// FormatXML formats an ErrorXML struct as a byte array
-func (eXML ErrorXML) FormatXML() ([]byte, error) {
+// Error returns a console-friendly version of the error contained in the struct
+func (e ErrorXMLError) Error() string {
 
-	errorxml, err := xml.Marshal(eXML)
-	return errorxml, err
+	return fmt.Sprintf("code %s, caused by: %s: %s", e.Code, e.Cause, e.Message)
 
 }
 

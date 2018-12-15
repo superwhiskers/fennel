@@ -18,58 +18,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
+// Package errors implements custom errors for libninty
 package errors
-
-import "fmt"
-
-// AccountServerError implements an error type for errors returned from the account server
-type AccountServerError struct {
-	Code    int
-	Message string
-}
-
-// Error returns a stringified version of the error from AccountServerError
-func (err *AccountServerError) Error() string {
-
-	return fmt.Sprintf("error code %d: %s", err.Code, err.Message)
-
-}
-
-// error declarations. do not edit these
-var (
-	BadRequestError = &AccountServerError{
-		Code:    1600,
-		Message: "unable to process request",
-	}
-	AccountIDExistsError = &AccountServerError{
-		Code:    100,
-		Message: "account id already exists",
-	}
-	InvalidApplicationError = &AccountServerError{
-		Code:    4,
-		Message: "invalid application credentials were provided in the request",
-	}
-	InvalidAccountIDError = &AccountServerError{
-		Code:    1104,
-		Message: "an invalid account id was provided in the request",
-	}
-
-	// TODO: check if this error is used in other places and change that to match it
-	InvalidVersionError = &AccountServerError{
-		Code:    1101,
-		Message: "an invalid version was provided in the request",
-	}
-
-	InvalidParameterError = &AccountServerError{
-		Code:    2,
-		Message: "an invalid parameter was provided in the request",
-	}
-
-	UnknownError = &AccountServerError{
-		Code:    -1,
-		Message: "an unknown error was returned from the server",
-	}
-
-	// error code lookup table
-	ErrorCodeToError = []*AccountServerError{}
-)
