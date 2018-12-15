@@ -18,5 +18,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
-// Package errors implements custom errors for libninty
 package errors
+
+const (
+	BadRequestError         = "1600"
+	AccountIDExistsError    = "0100"
+	InvalidApplicationError = "0004"
+	InvalidAccountIDError   = "1104"
+	InvalidVersionError     = "1101"
+	InvalidParameterError   = "0002"
+)

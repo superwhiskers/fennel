@@ -23,13 +23,12 @@ package libninty
 import (
 	"bytes"
 	"crypto/tls"
-	"io/ioutil"
 	"testing"
 
 	"github.com/valyala/fasthttp"
 )
 
-var nnClientInfo = NintendoNetworkClientInformation{
+var clientInfo = ClientInformation{
 	ClientID:     "ea25c66c26b403376b4c5ed94ab9cdea",
 	ClientSecret: "d137be62cb6a2b831cad8c013b92fb55",
 	DeviceCert:   "",
@@ -43,7 +42,7 @@ var nnClientInfo = NintendoNetworkClientInformation{
 	PlatformID:   "1",
 }
 
-func TestNewNintendoNetworkClient(t *testing.T) {
+func TestNewClient(t *testing.T) {
 
 	keyPair, err := tls.LoadX509KeyPair("keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem")
 	if err != nil {
@@ -52,8 +51,8 @@ func TestNewNintendoNetworkClient(t *testing.T) {
 
 	}
 
-	expectedOutput := &NintendoNetworkClient{
-		AccountServerAPIEndpoint: "https://account.pretendo.cc/v1/api",
+	expectedOutput := &Client{
+		AccountServerAPIEndpoint: "https://account.nintendo.net/v1/api",
 		HTTPClient: &fasthttp.Client{
 			TLSConfig: &tls.Config{
 				Certificates:       []tls.Certificate{keyPair},
@@ -61,22 +60,10 @@ func TestNewNintendoNetworkClient(t *testing.T) {
 				InsecureSkipVerify: true,
 			},
 		},
-		ClientInformation: NintendoNetworkClientInformation{
-			ClientID:     "ea25c66c26b403376b4c5ed94ab9cdea",
-			ClientSecret: "d137be62cb6a2b831cad8c013b92fb55",
-			DeviceCert:   "",
-			Environment:  "",
-			Country:      "",
-			Region:       "",
-			SysVersion:   "",
-			Serial:       "",
-			DeviceID:     "",
-			DeviceType:   "",
-			PlatformID:   "",
-		},
+		ClientInformation: clientInfo,
 	}
 
-	output, err := NewNintendoNetworkClient("https://account.pretendo.cc/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", nnClientInfo)
+	output, err := NewClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
@@ -93,7 +80,7 @@ func TestNewNintendoNetworkClient(t *testing.T) {
 
 func TestDoesUserExist(t *testing.T) {
 
-	client, err := NewNintendoNetworkClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", nnClientInfo)
+	client, err := NewClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
@@ -119,7 +106,7 @@ func TestGetEULA(t *testing.T) {
 
 	eulaXML := []byte{}
 
-	client, err := NewNintendoNetworkClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", nnClientInfo)
+	client, err := NewClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
@@ -133,12 +120,12 @@ func TestGetEULA(t *testing.T) {
 
 	}
 
-	err = ioutil.WriteFile("eula.xml", output, 0644)
+	/*err = ioutil.WriteFile("eula.xml", output, 0644)
 	if err != nil {
 
 		t.Errorf("unable to write the eula to the file. error: %v\n", err)
 
-	}
+	}*/
 
 	// TODO: make the test validate it against the proposed struct for this
 	if !bytes.Equal(output, eulaXML) {

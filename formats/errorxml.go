@@ -25,6 +25,11 @@ import (
 	"fmt"
 )
 
+// NilErrorXML represents an ErrorXML with no value
+var NilErrorXML = ErrorXML{
+	Errors: []ErrorXMLError{},
+}
+
 // ErrorXML represents a nintendo network error xml sheet
 type ErrorXML struct {
 	XMLName xml.Name        `xml:"errors"`

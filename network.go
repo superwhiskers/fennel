@@ -22,7 +22,6 @@ package libninty
 
 import (
 	"crypto/tls"
-	"strings"
 
 	"github.com/valyala/fasthttp"
 )
@@ -46,16 +45,16 @@ type ClientInformation struct {
 type Client struct {
 	AccountServerAPIEndpoint string
 	HTTPClient               *fasthttp.Client
-	ClientInformation        NintendoNetworkClientInformation
+	ClientInformation        ClientInformation
 }
 
-// NewNintendoNetworkClient is a constructor function for creating a client to nintendo network servers
-func NewNintendoNetworkClient(accountServer string, certificatePath string, keyPath string, nnClientInfo NintendoNetworkClientInformation) (*NintendoNetworkClient, error) {
+// NewClient is a constructor function for creating a client to nintendo network servers
+func NewClient(accountServer string, certificatePath string, keyPath string, clientInfo ClientInformation) (*Client, error) {
 
 	keyPair, err := tls.LoadX509KeyPair(certificatePath, keyPath)
 	if err != nil {
 
-		return &NintendoNetworkClient{}, err
+		return &Client{}, err
 
 	}
 
@@ -67,18 +66,18 @@ func NewNintendoNetworkClient(accountServer string, certificatePath string, keyP
 		},
 	}
 
-	nnClient := &NintendoNetworkClient{
+	client := &Client{
 		AccountServerAPIEndpoint: accountServer,
 		HTTPClient:               httpClient,
-		ClientInformation:        nnClientInfo,
+		ClientInformation:        clientInfo,
 	}
 
-	return nnClient, nil
+	return client, nil
 
 }
 
-// Do is a method on NintendoNetworkClient that makes a request to any url with the nintendo network headers and clientcert
-func (c *NintendoNetworkClient) Do(request *fasthttp.Request, response *fasthttp.Response) error {
+// Do makes a request with headers set to make it look like you are a nintendo console
+func (c *Client) Do(request *fasthttp.Request, response *fasthttp.Response) error {
 
 	request.Header.Set("X-Nintendo-Client-ID", c.ClientInformation.ClientID)
 	request.Header.Set("X-Nintendo-Client-Secret", c.ClientInformation.ClientSecret)
@@ -95,114 +94,5 @@ func (c *NintendoNetworkClient) Do(request *fasthttp.Request, response *fasthttp
 	request.Header.Set("X-Nintendo-FPD-Version", "0000")
 
 	return c.HTTPClient.Do(request, response)
-
-}
-
-// DoesUserExist is a method on NintendoNetworkClient that requests info about a user from the nintendo network servers
-func (c *NintendoNetworkClient) DoesUserExist(nnid string) (bool, NintendoNetworkErrorXML, error) {
-
-	request := fasthttp.AcquireRequest()
-	response := fasthttp.AcquireResponse()
-	requestHeader := fasthttp.RequestHeader{}
-
-	defer fasthttp.ReleaseRequest(request)
-	defer fasthttp.ReleaseResponse(response)
-
-	requestHeader.SetMethod("GET")
-	request.Header = requestHeader
-	request.SetRequestURI(strings.Join([]string{c.AccountServerAPIEndpoint, "/people/", nnid}, ""))
-
-	err := c.Do(request, response)
-	if err != nil {
-
-		return false, NintendoNetworkErrorXML{}, err
-
-	}
-
-	if response.StatusCode() == 200 {
-
-		return false, NintendoNetworkErrorXML{}, nil
-
-	}
-
-	var errorXML NintendoNetworkErrorXML
-
-	err = xml.Unmarshal(response.Body(), &errorXML)
-	if err != nil {
-
-		return false, NintendoNetworkErrorXML{}, err
-
-	}
-
-	switch errorXML.Code {
-
-	case AccountIDExistsError.Code:
-		return true, errorXML, nil
-
-	case InvalidAccountIDError.Code:
-		return false, errorXML, InvalidAccountIDError
-
-	case InvalidApplicationError.Code:
-		return false, errorXML, InvalidApplicationError
-
-	}
-
-	return false, errorXML, UnknownError
-
-}
-
-// GetEULA retrieves the Nintendo Network EULA for the specified country
-// if version is `@latest`, it returns the latest version. otherwise, it returns the specified version
-func (c *NintendoNetworkClient) GetEULA(countryCode, version string) ([]byte, NintendoNetworkErrorXML, error) {
-
-	request := fasthttp.AcquireRequest()
-	response := fasthttp.AcquireResponse()
-	requestHeader := fasthttp.RequestHeader{}
-
-	defer fasthttp.ReleaseRequest(request)
-	defer fasthttp.ReleaseResponse(response)
-
-	requestHeader.SetMethod("GET")
-	request.Header = requestHeader
-	request.SetRequestURI(strings.Join([]string{c.AccountServerAPIEndpoint, "/content/agreements/Nintendo-Network-EULA/", countryCode, "/", version}, ""))
-
-	err := c.Do(request, response)
-	if err != nil {
-
-		return []byte{}, NintendoNetworkErrorXML{}, err
-
-	}
-
-	if response.StatusCode() == 200 {
-
-		// TOOD: actually parse agreement xml here
-		// TOOD: make type for agreement xml
-		return response.Body(), NintendoNetworkErrorXML{}, nil
-
-	}
-
-	var errorXML NintendoNetworkErrorXML
-
-	err = xml.Unmarshal(response.Body(), &errorXML)
-	if err != nil {
-
-		return []byte{}, NintendoNetworkErrorXML{}, err
-
-	}
-
-	switch errorXML.Code {
-
-	case InvalidParameterError.Code:
-		return []byte{}, errorXML, InvalidParameterError
-
-	case InvalidApplicationError.Code:
-		return []byte{}, errorXML, InvalidApplicationError
-
-	case InvalidVersionError.Code:
-		return []byte{}, errorXML, InvalidVersionError
-
-	}
-
-	return []byte{}, errorXML, UnknownError
 
 }
