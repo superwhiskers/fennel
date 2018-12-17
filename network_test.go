@@ -21,7 +21,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package libninty
 
 import (
-	"bytes"
 	"crypto/tls"
 	"testing"
 
@@ -70,7 +69,7 @@ func TestNewClient(t *testing.T) {
 
 	}
 
-	if output == expectedOutput {
+	if output.ClientInformation != expectedOutput.ClientInformation {
 
 		t.Errorf("invalid output")
 
@@ -104,8 +103,6 @@ func TestDoesUserExist(t *testing.T) {
 
 func TestGetEULA(t *testing.T) {
 
-	eulaXML := []byte{}
-
 	client, err := NewClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
 	if err != nil {
 
@@ -120,15 +117,22 @@ func TestGetEULA(t *testing.T) {
 
 	}
 
-	/*err = ioutil.WriteFile("eula.xml", output, 0644)
-	if err != nil {
+	verified := false
+	for _, agreement := range output.Agreements {
 
-		t.Errorf("unable to write the eula to the file. error: %v\n", err)
+		if agreement.Language == "en" {
 
-	}*/
+			if agreement.Title.Data == "Nintendo Network Services Agreement" {
 
-	// TODO: make the test validate it against the proposed struct for this
-	if !bytes.Equal(output, eulaXML) {
+				verified = true
+
+			}
+
+		}
+
+	}
+
+	if verified == false {
 
 		t.Errorf("invalid output")
 

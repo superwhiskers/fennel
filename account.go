@@ -78,7 +78,7 @@ func (c *Client) DoesUserExist(nnid string) (bool, formats.ErrorXML, error) {
 
 // GetEULA retrieves the Nintendo Network EULA for the specified country.
 // if version is `@latest`, it returns the latest version. otherwise, it returns the specified version
-func (c *Client) GetEULA(countryCode, version string) ([]byte, formats.ErrorXML, error) {
+func (c *Client) GetEULA(countryCode, version string) (formats.AgreementXML, formats.ErrorXML, error) {
 
 	request := fasthttp.AcquireRequest()
 	response := fasthttp.AcquireResponse()
@@ -94,25 +94,30 @@ func (c *Client) GetEULA(countryCode, version string) ([]byte, formats.ErrorXML,
 	err := c.Do(request, response)
 	if err != nil {
 
-		return []byte{}, formats.NilErrorXML, err
+		return formats.NilAgreementXML, formats.NilErrorXML, err
 
 	}
 
 	if response.StatusCode() == 200 {
 
-		// TOOD: actually parse agreement xml here
-		// TOOD: make type for agreement xml
-		return response.Body(), formats.NilErrorXML, nil
+		axml, err := formats.ParseAgreementXML(response.Body())
+		if err != nil {
+
+			return formats.NilAgreementXML, formats.NilErrorXML, err
+
+		}
+
+		return axml, formats.NilErrorXML, nil
 
 	}
 
 	errorXML, err := formats.ParseErrorXML(response.Body())
 	if err != nil {
 
-		return []byte{}, formats.NilErrorXML, err
+		return formats.NilAgreementXML, formats.NilErrorXML, err
 
 	}
 
-	return []byte{}, errorXML, nil
+	return formats.NilAgreementXML, errorXML, nil
 
 }
