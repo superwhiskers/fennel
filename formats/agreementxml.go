@@ -25,6 +25,11 @@ import (
 	"time"
 )
 
+// NilAgreementXML represents an AgreementXML with no value
+var NilAgreementXML = AgreementXML{
+	Agreements: []AgreementXMLAgreement{},
+}
+
 // AgreementXML represents a nintendo network agreement xml sheet
 type AgreementXML struct {
 	XMLName    xml.Name                `xml:"agreements"`
