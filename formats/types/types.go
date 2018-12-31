@@ -18,23 +18,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
-package formats
-
-import (
-	"encoding/base64"
-	"encoding/hex"
-)
-
-// ParseServicetoken is a function that takes a base64ed servicetoken and converts it to hexadecimal
-func ParseServicetoken(servicetoken string) (string, error) {
-
-	decodedServicetoken, err := base64.StdEncoding.DecodeString(servicetoken)
-	if err != nil {
-
-		return "", err
-
-	}
-
-	return hex.EncodeToString(decodedServicetoken), nil
-
-}
+// Package types contains utilities for handling different types of data used by nintendo
+package types

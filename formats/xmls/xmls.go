@@ -18,5 +18,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
-// Package formats provides datatypes and functions for handling different nintendo data formats
-package formats
+// Package xmls contains utilities for handling different xml structures used in nintendo network
+package xmls

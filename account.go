@@ -24,12 +24,12 @@ import (
 	"strings"
 
 	"github.com/superwhiskers/libninty/errors"
-	"github.com/superwhiskers/libninty/formats"
+	"github.com/superwhiskers/libninty/formats/xmls"
 	"github.com/valyala/fasthttp"
 )
 
 // DoesUserExist checks if a user with the given nnid exists on nintendo network
-func (c *Client) DoesUserExist(nnid string) (bool, formats.ErrorXML, error) {
+func (c *Client) DoesUserExist(nnid string) (bool, xmls.ErrorXML, error) {
 
 	request := fasthttp.AcquireRequest()
 	response := fasthttp.AcquireResponse()
@@ -45,20 +45,20 @@ func (c *Client) DoesUserExist(nnid string) (bool, formats.ErrorXML, error) {
 	err := c.Do(request, response)
 	if err != nil {
 
-		return false, formats.NilErrorXML, err
+		return false, xmls.NilErrorXML, err
 
 	}
 
 	if response.StatusCode() == 200 {
 
-		return false, formats.NilErrorXML, nil
+		return false, xmls.NilErrorXML, nil
 
 	}
 
-	errorXML, err := formats.ParseErrorXML(response.Body())
+	errorXML, err := xmls.ParseErrorXML(response.Body())
 	if err != nil {
 
-		return false, formats.NilErrorXML, err
+		return false, xmls.NilErrorXML, err
 
 	}
 
@@ -66,7 +66,7 @@ func (c *Client) DoesUserExist(nnid string) (bool, formats.ErrorXML, error) {
 
 		if error.Code == errors.AccountIDExistsError {
 
-			return true, formats.NilErrorXML, nil
+			return true, xmls.NilErrorXML, nil
 
 		}
 
@@ -78,7 +78,7 @@ func (c *Client) DoesUserExist(nnid string) (bool, formats.ErrorXML, error) {
 
 // GetEULA retrieves the Nintendo Network EULA for the specified country.
 // if version is `@latest`, it returns the latest version. otherwise, it returns the specified version
-func (c *Client) GetEULA(countryCode, version string) (formats.AgreementXML, formats.ErrorXML, error) {
+func (c *Client) GetEULA(countryCode, version string) (xmls.AgreementXML, xmls.ErrorXML, error) {
 
 	request := fasthttp.AcquireRequest()
 	response := fasthttp.AcquireResponse()
@@ -94,30 +94,30 @@ func (c *Client) GetEULA(countryCode, version string) (formats.AgreementXML, for
 	err := c.Do(request, response)
 	if err != nil {
 
-		return formats.NilAgreementXML, formats.NilErrorXML, err
+		return xmls.NilAgreementXML, xmls.NilErrorXML, err
 
 	}
 
 	if response.StatusCode() == 200 {
 
-		axml, err := formats.ParseAgreementXML(response.Body())
+		axml, err := xmls.ParseAgreementXML(response.Body())
 		if err != nil {
 
-			return formats.NilAgreementXML, formats.NilErrorXML, err
+			return xmls.NilAgreementXML, xmls.NilErrorXML, err
 
 		}
 
-		return axml, formats.NilErrorXML, nil
+		return axml, xmls.NilErrorXML, nil
 
 	}
 
-	errorXML, err := formats.ParseErrorXML(response.Body())
+	errorXML, err := xmls.ParseErrorXML(response.Body())
 	if err != nil {
 
-		return formats.NilAgreementXML, formats.NilErrorXML, err
+		return xmls.NilAgreementXML, xmls.NilErrorXML, err
 
 	}
 
-	return formats.NilAgreementXML, errorXML, nil
+	return xmls.NilAgreementXML, errorXML, nil
 
 }
