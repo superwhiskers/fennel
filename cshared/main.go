@@ -22,25 +22,29 @@ import (
 	"unsafe"
 
 	"github.com/superwhiskers/libninty"
-	"github.com/superwhiskers/libninty/formats/xmls"
 )
 
 //export libninty_newClient
 func libninty_newClient(accountServer, certificatePath, keyPath string, clientInfo C.struct_ClientInformation) C.Client {
 
-	Client := libninty.NewClient(accountServer, certificatePath, keyPath, libninty.ClientInformation{
-		ClientID: C.GoString(clientInfo._ClientID),
-		ClientSecret: C.GoString(clientInfo._ClientSecret),
-		DeviceCert: C.GoString(clientInfo._DeviceCert),
-		Environment: C.GoString(clientInfo._Environment),
-		Country: C.GoString(clientInfo._Country),
-		Region: C.GoString(clientInfo._Region),
-		SysVersion: C.GoString(clientInfo._SysVersion),
-		Serial: C.GoString(clientInfo._Serial),
-		DeviceID: C.GoString(clientInfo._DeviceID),
-		DeviceType: C.GoString(clientInfo._DeviceType),
-		PlatformID: C.GoString(clientInfo._PlatformID),
+	Client, err := libninty.NewClient(accountServer, certificatePath, keyPath, libninty.ClientInformation{
+		ClientID: C.GoString(clientInfo.ClientID),
+		ClientSecret: C.GoString(clientInfo.ClientSecret),
+		DeviceCert: C.GoString(clientInfo.DeviceCert),
+		Environment: C.GoString(clientInfo.Environment),
+		Country: C.GoString(clientInfo.Country),
+		Region: C.GoString(clientInfo.Region),
+		SysVersion: C.GoString(clientInfo.SysVersion),
+		Serial: C.GoString(clientInfo.Serial),
+		DeviceID: C.GoString(clientInfo.DeviceID),
+		DeviceType: C.GoString(clientInfo.DeviceType),
+		PlatformID: C.GoString(clientInfo.PlatformID),
 	})
+	if err != nil {
+
+		panic(err)
+
+	}
 
 	return C.Client(unsafe.Pointer(Client))
 
@@ -56,19 +60,27 @@ func libninty_doesUserExist(clientPtr C.Client, nnid string) int {
 
 		panic(err)
 
-	} else if xml != xmls.NilErrorXML {
+	} else if len(xml.Errors) != 0 {
 
-		panic(xml)
+		panic(xml.Errors[0])
 
 	}
 
-	return int(exists)
+	if exists {
+
+		return 1
+
+	} else {
+
+		return 0	
+
+	}
 
 }
 
 func convertPointerToClient(ptr C.Client) *libninty.Client {
 
-	return *libninty.Client(unsafe.Pointer(ptr))
+	return (*libninty.Client)(unsafe.Pointer(ptr))
 
 }
 
