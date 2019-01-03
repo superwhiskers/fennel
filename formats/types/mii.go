@@ -20,63 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package types
 
-import (
-	//"bytes"
-	"encoding/binary"
-)
-
-// applies a slice to a slice at the specified offset
-func applySliceAtOffset(src, dest []byte, offset int) []byte {
-
-	for i, byt := range src {
-
-		dest[offset+i] = byt
-
-	}
-	return dest
-
-}
-
-
-// uint32 little-endian -> big-endian
-// offsets should be zero-indexed
-func swap32Big(data []byte, offset int) []byte {
-
-	byteSection := []byte{0, 0, 0, 0}
-	binary.BigEndian.PutUint32(byteSection, binary.LittleEndian.Uint32(data[offset:offset+4]))
-	return applySliceAtOffset(byteSection, data, offset)
-
-}
-
-// uint32 big-endian -> little-endian
-// offsets should be zero-indexed
-func swap32Little(data []byte, offset int) []byte {
-
-	byteSection := []byte{0, 0, 0, 0}
-	binary.LittleEndian.PutUint32(byteSection, binary.BigEndian.Uint32(data[offset:offset+4]))
-	return applySliceAtOffset(byteSection, data, offset)
-
-}
-
-// uint16 little-endian -> big-endian
-// offsets should be zero-indexed
-func swap16Big(data []byte, offset int) []byte {
-
-	byteSection := []byte{0, 0}
-	binary.BigEndian.PutUint16(byteSection, binary.LittleEndian.Uint16(data[offset:offset+2]))
-	return applySliceAtOffset(byteSection, data, offset)
-
-}
-
-// uint16 big-endian -> little-endian
-// offsets should be zero-indexed
-func swap16Little(data []byte, offset int) []byte {
-
-	byteSection := []byte{0, 0}
-	binary.LittleEndian.PutUint16(byteSection, binary.BigEndian.Uint16(data[offset:offset+2]))
-	return applySliceAtOffset(byteSection, data, offset)
-
-}
+import "github.com/superwhiskers/libninty/utils"
 
 // Mii contains all of the data that a mii can have
 type Mii struct {
@@ -247,14 +191,35 @@ var NilMii = Mii{
 	MoleEnabled:      false,
 }
 
+// swaps the endianness of a mii binary format to little-endian
+func swapMiiEndiannessToLittle(data []byte) []byte {
+
+	data = utils.Swapu32Little(data, 0x00)
+
+	for i := 0x18; i <= 0x2E; i += 2 {
+
+		data = utils.Swapu16Little(data, i)
+
+	}
+
+	for i := 0x30; i <= 0x5C; i += 2 {
+
+		data = utils.Swapu16Little(data, i)
+
+	}
+
+	data = utils.Swapu16Little(data, 0x5C)
+
+	return data
+
+}
+
 // ParseMii takes a mii as a byte array and parses it to a Mii
 func ParseMii(miiByte []byte) Mii {
 
-	/*section := miiByte[:95]
-	bigEndian := []byte{}
+	/*buffer := utils.NewByteBuffer(swapMiiEndiannessToLittle(miiByte[:0x60]))
+	mii := Mii{}*/
 
-	// run buffer.Next a bit here*/
-	
 	return NilMii
 
 }
