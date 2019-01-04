@@ -20,25 +20,26 @@ typedef void* Client;
 import "C"
 import (
 	"unsafe"
+	"strings"
 
 	"github.com/superwhiskers/libninty"
 )
 
 //export libninty_newClient
-func libninty_newClient(accountServer, certificatePath, keyPath string, clientInfo C.struct_ClientInformation) C.Client {
+func libninty_newClient(accountServer, certificatePath, keyPath *C.char, clientInfo C.struct_ClientInformation) C.Client {
 
-	Client, err := libninty.NewClient(accountServer, certificatePath, keyPath, libninty.ClientInformation{
-		ClientID: C.GoString(clientInfo.ClientID),
-		ClientSecret: C.GoString(clientInfo.ClientSecret),
-		DeviceCert: C.GoString(clientInfo.DeviceCert),
-		Environment: C.GoString(clientInfo.Environment),
-		Country: C.GoString(clientInfo.Country),
-		Region: C.GoString(clientInfo.Region),
-		SysVersion: C.GoString(clientInfo.SysVersion),
-		Serial: C.GoString(clientInfo.Serial),
-		DeviceID: C.GoString(clientInfo.DeviceID),
-		DeviceType: C.GoString(clientInfo.DeviceType),
-		PlatformID: C.GoString(clientInfo.PlatformID),
+	Client, err := libninty.NewClient(gostring(accountServer), gostring(certificatePath), gostring(keyPath), libninty.ClientInformation{
+		ClientID: gostring(clientInfo.ClientID),
+		ClientSecret: gostring(clientInfo.ClientSecret),
+		DeviceCert: gostring(clientInfo.DeviceCert),
+		Environment: gostring(clientInfo.Environment),
+		Country: gostring(clientInfo.Country),
+		Region: gostring(clientInfo.Region),
+		SysVersion: gostring(clientInfo.SysVersion),
+		Serial: gostring(clientInfo.Serial),
+		DeviceID: gostring(clientInfo.DeviceID),
+		DeviceType: gostring(clientInfo.DeviceType),
+		PlatformID: gostring(clientInfo.PlatformID),
 	})
 	if err != nil {
 
@@ -51,11 +52,11 @@ func libninty_newClient(accountServer, certificatePath, keyPath string, clientIn
 }
 
 //export libninty_doesUserExist
-func libninty_doesUserExist(clientPtr C.Client, nnid string) int {
+func libninty_doesUserExist(clientPtr C.Client, nnid *C.char) int {
 
 	client := convertPointerToClient(clientPtr)
 
-	exists, xml, err := client.DoesUserExist(nnid)
+	exists, xml, err := client.DoesUserExist(gostring(nnid))
 	if err != nil {
 
 		panic(err)
@@ -81,6 +82,12 @@ func libninty_doesUserExist(clientPtr C.Client, nnid string) int {
 func convertPointerToClient(ptr C.Client) *libninty.Client {
 
 	return (*libninty.Client)(unsafe.Pointer(ptr))
+
+}
+
+func gostring(str *C.char) string {
+
+	return strings.TrimSuffix(C.GoString(str), "\x00")
 
 }
 
