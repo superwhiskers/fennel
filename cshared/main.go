@@ -26,9 +26,7 @@ import (
 )
 
 //export libninty_newClient
-func libninty_newClient(accountServer, certificatePath, keyPath *C.char, clientInfo C.struct_ClientInformation) C.Client {
-
-	Client, err := libninty.NewClient(gostring(accountServer), gostring(certificatePath), gostring(keyPath), libninty.ClientInformation{
+func libninty_newClient(accountServer, certificatePath, keyPath *C.char, clientInfo C.struct_ClientInformation) C.Clielient, err := libninty.NewClient(gostring(accountServer), gostring(certificatePath), gostring(keyPath), libninty.ClientInformation{
 		ClientID: gostring(clientInfo.ClientID),
 		ClientSecret: gostring(clientInfo.ClientSecret),
 		DeviceCert: gostring(clientInfo.DeviceCert),
@@ -52,7 +50,7 @@ func libninty_newClient(accountServer, certificatePath, keyPath *C.char, clientI
 }
 
 //export libninty_doesUserExist
-func libninty_doesUserExist(clientPtr C.Client, nnid *C.char) int {
+func libninty_doesUserExist(clientPtr C.Client, nnid *C.char) C.int {
 
 	client := convertPointerToClient(clientPtr)
 
@@ -69,11 +67,11 @@ func libninty_doesUserExist(clientPtr C.Client, nnid *C.char) int {
 
 	if exists {
 
-		return 1
+		return C.int(1)
 
 	} else {
 
-		return 0	
+		return C.int(0)	
 
 	}
 
