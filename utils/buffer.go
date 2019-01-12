@@ -164,12 +164,12 @@ func (b *ByteBuffer) refresh() {
 
 }
 
-// seek 
+// seek seeks to position off of the byte buffer or relative to the current position
 func (b *ByteBuffer) seek(off int, relative bool) {
 
 	b.Lock()
 	defer b.Unlock()
-	
+
 	if relative == true {
 
 		b.off = b.off + off
@@ -183,6 +183,7 @@ func (b *ByteBuffer) seek(off int, relative bool) {
 	return
 
 }
+
 /* public methods */
 
 // Bytes returns the internal byte slice of the buffer
@@ -222,7 +223,7 @@ func (b *ByteBuffer) Grow(n int) {
 
 }
 
-// Seek seeks to position off of the byte buffer
+// Seek seeks to position off of the byte buffer or relative to the current position
 func (b *ByteBuffer) Seek(off int, relative bool) {
 
 	b.seek(off, relative)
@@ -241,7 +242,7 @@ func (b *ByteBuffer) Read(off, n int) []byte {
 func (b *ByteBuffer) ReadNext(n int) (out []byte) {
 
 	out = b.read(b.off, n)
-	b.off = b.off + n
+	b.seek(n, true)
 	return
 
 }
@@ -266,8 +267,7 @@ func (b *ByteBuffer) WriteBytes(off int, data []byte) {
 func (b *ByteBuffer) WriteByteNext(data byte) {
 
 	b.write(b.off, []byte{data})
-	b.off = b.off + 1
-
+	b.seek(1, true)
 	return
 
 }
@@ -276,8 +276,7 @@ func (b *ByteBuffer) WriteByteNext(data byte) {
 func (b *ByteBuffer) WriteBytesNext(data []byte) {
 
 	b.write(b.off, data)
-	b.off = b.off + len(data)
-
+	b.seek(len(data), true)
 	return
 
 }
