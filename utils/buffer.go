@@ -97,7 +97,7 @@ func (b *ByteBuffer) write(off int, data []byte) {
 
 	if (off + len(data)) > b.cap {
 
-		panic("write exceeds buffer capacity")
+		panic("libninty: bytebuffer: write exceeds buffer capacity")
 
 	}
 
@@ -130,7 +130,7 @@ func (b *ByteBuffer) read(off int, n int) []byte {
 
 	if (off + n) > b.cap {
 
-		panic("read exceeds buffer capacity")
+		panic("libninty: bytebuffer: read exceeds buffer capacity")
 
 	}
 
@@ -211,39 +211,6 @@ func (b *ByteBuffer) Offset(off int) {
 
 }
 
-// Next returns the next n bytes from the current offset and moves the offset foward the amount of bytes read
-func (b *ByteBuffer) Next(n int) (out []byte) {
-
-	out = b.read(b.off, n)
-	b.off = b.off + n
-	return
-
-}
-
-// WriteNext writes data to the buffer at the current offset and moves the offset foward the amount of bytes written with data either being a byte or a byte slice
-func (b *ByteBuffer) WriteNext(data interface{}) {
-
-	switch data.(type) {
-
-	case []byte:
-		b.write(b.off, data.([]byte))
-		b.off = b.off + len(data.([]byte))
-		break
-
-	case byte:
-		b.write(b.off, []byte{data.(byte)})
-		b.off = b.off + 1
-		break
-
-	default:
-		panic("libninty: buffer: an invalid data type was passed to WriteNext")
-
-	}
-
-	return
-
-}
-
 // Read returns the next n bytes from the specified offset without modifying the internal offset value
 func (b *ByteBuffer) Read(off, n int) []byte {
 
@@ -251,22 +218,46 @@ func (b *ByteBuffer) Read(off, n int) []byte {
 
 }
 
-// Write writes data to the buffer at the specified offset without modifying the internal offset value with data either being a byte or a byte slice
-func (b *ByteBuffer) Write(off int, data interface{}) {
+// ReadNext returns the next n bytes from the current offset and moves the offset foward the amount of bytes read
+func (b *ByteBuffer) ReadNext(n int) (out []byte) {
 
-	switch data.(type) {
+	out = b.read(b.off, n)
+	b.off = b.off + n
+	return
 
-	case []byte:
-		b.write(off, data.([]byte))
-		break
+}
 
-	case byte:
-		b.write(off, []byte{data.(byte)})
-		break
+// WriteByte writes a byte to the buffer at the specified offset without modifying the internal offset value
+func (b *ByteBuffer) WriteByte(off int, data byte) {
 
-	default:
-		panic("libninty: buffer: an invalid data type was passed to Write")
-	}
+	b.write(off, []byte{data})
+	return
+
+}
+
+// WriteByte writes bytes to the buffer at the specified offset without modifying the internal offset value
+func (b *ByteBuffer) WriteBytes(off int, data []byte) {
+
+	b.write(off, data)
+	return
+
+}
+
+// WriteByteNext writes a byte to the buffer at the current offset and moves the offset foward the amount of bytes written
+func (b *ByteBuffer) WriteByteNext(data byte) {
+
+	b.write(b.off, []byte{data})
+	b.off = b.off + 1
+
+	return
+
+}
+
+// WriteBytesNext writes bytes to the buffer at the current offset and moves the offset foward the amount of bytes written
+func (b *ByteBuffer) WriteByteNext(data []byte) {
+
+	b.write(b.off, data)
+	b.off = b.off + len(data)
 
 	return
 
