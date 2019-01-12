@@ -22,6 +22,24 @@ package utils
 
 import "encoding/binary"
 
+// Swapu64Big converts part of a byte slice from little-endian uint64 to big-endian uint64 starting at the specified offset, and covering eight indexes
+func Swapu64Big(data []byte, offset int) []byte {
+
+	byteSection := []byte{0, 0, 0, 0, 0, 0, 0, 0}
+	binary.BigEndian.PutUint64(byteSection, binary.LittleEndian.Uint64(data[offset:offset+8]))
+	return ApplyByteSliceAtOffset(byteSection, data, offset)
+
+}
+
+// Swapu64Little converts part of a byte slice from big-endian uint64 to little-endian uint64 starting at the specified offset, and covering eight indexes
+func Swapu64Little(data []byte, offset int) []byte {
+
+	byteSection := []byte{0, 0, 0, 0, 0, 0, 0, 0}
+	binary.LittleEndian.PutUint64(byteSection, binary.BigEndian.Uint64(data[offset:offset+8]))
+	return ApplyByteSliceAtOffset(byteSection, data, offset)
+
+}
+
 // Swapu32Big converts part of a byte slice from little-endian uint32 to big-endian uint32 starting at the specified offset, and covering four indexes
 func Swapu32Big(data []byte, offset int) []byte {
 
@@ -40,7 +58,7 @@ func Swapu32Little(data []byte, offset int) []byte {
 
 }
 
-// Swapu16Big converts part of a byte slice from little-endian uint16 to big-endian uint16 starting at the specified offset, and covering four indexes
+// Swapu16Big converts part of a byte slice from little-endian uint16 to big-endian uint16 starting at the specified offset, and covering two indexes
 func Swapu16Big(data []byte, offset int) []byte {
 
 	byteSection := []byte{0, 0}
@@ -49,7 +67,7 @@ func Swapu16Big(data []byte, offset int) []byte {
 
 }
 
-// Swapu16Little converts part of a byte slice from big-endian uint16 to little-endian uint16 starting at the specified offset, and covering four indexes
+// Swapu16Little converts part of a byte slice from big-endian uint16 to little-endian uint16 starting at the specified offset, and covering two indexes
 func Swapu16Little(data []byte, offset int) []byte {
 
 	byteSection := []byte{0, 0}
