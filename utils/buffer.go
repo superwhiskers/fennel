@@ -220,7 +220,7 @@ func (b *ByteBuffer) Next(n int) (out []byte) {
 
 }
 
-// WriteNext writes data to the buffer at the current offset and moves the offset foward the amount of bytes written
+// WriteNext writes data to the buffer at the current offset and moves the offset foward the amount of bytes written with data either being a byte or a byte slice
 func (b *ByteBuffer) WriteNext(data interface{}) {
 
 	switch data.(type) {
@@ -251,7 +251,7 @@ func (b *ByteBuffer) Read(off, n int) []byte {
 
 }
 
-// Write writes data to the buffer at the specified offset without modifying the internal offset value
+// Write writes data to the buffer at the specified offset without modifying the internal offset value with data either being a byte or a byte slice
 func (b *ByteBuffer) Write(off int, data interface{}) {
 
 	switch data.(type) {
