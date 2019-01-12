@@ -25,6 +25,8 @@ import (
 	//"encoding/binary"
 	//"io"
 	"sync"
+
+	"github.com/superwhiskers/libninty/errors"
 )
 
 // ByteBuffer implements a concurrent-safe byte buffer implementation in go
@@ -97,7 +99,7 @@ func (b *ByteBuffer) write(off int, data []byte) {
 
 	if (off + len(data)) > b.cap {
 
-		panic("libninty: bytebuffer: write exceeds buffer capacity")
+		panic(errors.ByteBufferOverwriteError)
 
 	}
 
@@ -130,7 +132,7 @@ func (b *ByteBuffer) read(off int, n int) []byte {
 
 	if (off + n) > b.cap {
 
-		panic("libninty: bytebuffer: read exceeds buffer capacity")
+		panic(errors.ByteBufferOverwriteError)
 
 	}
 

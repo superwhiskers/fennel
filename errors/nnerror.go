@@ -20,28 +20,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package errors
 
-import "fmt"
-
-// LibnintyError implements a custom error type used in libninty
-type LibnintyError struct{
-	scope string
-	error string
-}
-
-// Error formats the error held in a LibnintyError as a string
-func (e LibnintyError) Error() string {
-
-	return fmt.Sprintf("libninty: %s: %s", e.scope, e.error)
-
-}
-
-var (
-	ByteBufferOverreadError = LibnintyError{
-		scope: "bytebuffer",
-		error: "read exceeds buffer capacity",
-	}
-	ByteBufferOverwriteError = LibnintyError{
-		scope: "bytebuffer",
-		error: "write exceeds buffer capacity",
-	}
+const (
+	BadRequestError         = "1600"
+	AccountIDExistsError    = "0100"
+	InvalidApplicationError = "0004"
+	InvalidAccountIDError   = "1104"
+	InvalidVersionError     = "1101"
+	InvalidParameterError   = "0002"
 )
