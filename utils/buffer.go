@@ -164,6 +164,25 @@ func (b *ByteBuffer) refresh() {
 
 }
 
+// seek 
+func (b *ByteBuffer) seek(off int, relative bool) {
+
+	b.Lock()
+	defer b.Unlock()
+	
+	if relative == true {
+
+		b.off = b.off + off
+
+	} else {
+
+		b.off = off
+
+	}
+
+	return
+
+}
 /* public methods */
 
 // Bytes returns the internal byte slice of the buffer
@@ -203,10 +222,10 @@ func (b *ByteBuffer) Grow(n int) {
 
 }
 
-// Offset sets the internal offset value
-func (b *ByteBuffer) Offset(off int) {
+// Seek seeks to position off of the byte buffer
+func (b *ByteBuffer) Seek(off int, relative bool) {
 
-	b.off = off
+	b.seek(off, relative)
 	return
 
 }
