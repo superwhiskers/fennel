@@ -254,7 +254,7 @@ func (b *ByteBuffer) WriteByteNext(data byte) {
 }
 
 // WriteBytesNext writes bytes to the buffer at the current offset and moves the offset foward the amount of bytes written
-func (b *ByteBuffer) WriteByteNext(data []byte) {
+func (b *ByteBuffer) WriteBytesNext(data []byte) {
 
 	b.write(b.off, data)
 	b.off = b.off + len(data)
