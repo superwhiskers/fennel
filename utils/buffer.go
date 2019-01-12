@@ -1,3 +1,23 @@
+/*
+
+libninty - nintendo network utility library for golang
+copyright (c) 2018 superwhiskers <whiskerdev@protonmail.com>
+
+this program is free software: you can redistribute it and/or modify
+it under the terms of the gnu lesser general public license as published by
+the free software foundation, either version 3 of the license, or
+(at your option) any later version.
+
+this program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.  see the
+gnu lesser general public license for more details.
+
+you should have received a copy of the gnu lesser general public license
+along with this program.  if not, see <https://www.gnu.org/licenses/>.
+
+*/
+
 package utils
 
 import (
@@ -10,11 +30,11 @@ import (
 // ByteBuffer implements a concurrent-safe byte buffer implementation in go
 type ByteBuffer struct {
 	buf []byte
-	ind int
+	off int
 	cap int
 	occ int
 
-	*sync.Mutex
+	sync.Mutex
 }
 
 // NewByteBuffer initilaizes a new ByteBuffer with the provided byte slices stored inside in the order provided
@@ -22,7 +42,7 @@ func NewByteBuffer(slices ...[]byte) (buf *ByteBuffer) {
 
 	buf = &ByteBuffer{
 		buf: []byte{},
-		ind: 0,
+		off: 0,
 	}
 
 	switch len(slices) {
@@ -48,6 +68,8 @@ func NewByteBuffer(slices ...[]byte) (buf *ByteBuffer) {
 	return
 
 }
+
+/* internal use methods */
 
 // occupied calculates the number of zero bytes in the buffer
 func (b *ByteBuffer) occupied() (occ int) {
@@ -115,17 +137,34 @@ func (b *ByteBuffer) read(off int, n int) []byte {
 	b.Lock()
 	defer b.Unlock()
 
-	return b.buf[off : off+(n-1)]
+	return b.buf[off : off+n]
 
 }
 
-// Refresh updates the cached internal statistics of the byte buffer forcefully
-func (b *ByteBuffer) Refresh() {
+// grow grows the buffer by n bytes
+func (b *ByteBuffer) grow(n int) {
+
+	b.Lock()
+	defer b.Unlock()
+
+	b.buf = append(b.buf, make([]byte, n)...)
+	b.cap = len(b.buf)
+
+	return
+
+}
+
+// refresh updates the internal statistics of the byte buffer forcefully
+func (b *ByteBuffer) refresh() {
 
 	b.cap = len(b.buf)
 	b.occ = b.occupied()
 
+	return
+
 }
+
+/* public methods */
 
 // Bytes returns the internal byte slice of the buffer
 func (b *ByteBuffer) Bytes() []byte {
@@ -137,14 +176,7 @@ func (b *ByteBuffer) Bytes() []byte {
 // Capacity returns the capacity of the buffer
 func (b *ByteBuffer) Capacity() int {
 
-	return len(b.buf)
-
-}
-
-// Grow makes the buffer's capacity bigger by n bytes
-func (b *ByteBuffer) Grow(n int) {
-
-	b.buf = append(b.buf, make([]byte, n)...)
+	return b.cap
 
 }
 
@@ -155,12 +187,92 @@ func (b *ByteBuffer) Occupied() int {
 
 }
 
-/*
-func (b *ByteBuffer) Next(n int) []byte {
+// Refresh updates the cached internal statistics of the byte buffer forcefully
+func (b *ByteBuffer) Refresh() {
 
-	return b.buf.Next(n)
+	b.refresh()
+	return
 
 }
+
+// Grow makes the buffer's capacity bigger by n bytes
+func (b *ByteBuffer) Grow(n int) {
+
+	b.grow(n)
+	return
+
+}
+
+// Offset sets the internal offset value
+func (b *ByteBuffer) Offset(off int) {
+
+	b.off = off
+	return
+
+}
+
+// Next returns the next n bytes from the current offset and moves the offset foward the amount of bytes read
+func (b *ByteBuffer) Next(n int) (out []byte) {
+
+	out = b.read(b.off, n)
+	b.off = b.off + n
+	return
+
+}
+
+// WriteNext writes data to the buffer at the current offset and moves the offset foward the amount of bytes written
+func (b *ByteBuffer) WriteNext(data interface{}) {
+
+	switch data.(type) {
+
+	case []byte:
+		b.write(b.off, data.([]byte))
+		b.off = b.off + len(data.([]byte))
+		break
+
+	case byte:
+		b.write(b.off, []byte{data.(byte)})
+		b.off = b.off + 1
+		break
+
+	default:
+		panic("libninty: buffer: an invalid data type was passed to WriteNext")
+
+	}
+
+	return
+
+}
+
+// Read returns the next n bytes from the specified offset without modifying the internal offset value
+func (b *ByteBuffer) Read(off, n int) []byte {
+
+	return b.read(off, n)
+
+}
+
+// Write writes data to the buffer at the specified offset without modifying the internal offset value
+func (b *ByteBuffer) Write(off int, data interface{}) {
+
+	switch data.(type) {
+
+	case []byte:
+		b.write(off, data.([]byte))
+		break
+
+	case byte:
+		b.write(off, []byte{data.(byte)})
+		break
+
+	default:
+		panic("libninty: buffer: an invalid data type was passed to Write")
+	}
+
+	return
+
+}
+
+/*
 
 func (b *ByteBuffer) Nextu16Little() uint16 {
 
@@ -195,12 +307,6 @@ func (b *ByteBuffer) Nextu64Little() uint64 {
 func (b *ByteBuffer) Nextu64Big() uint64 {
 
 	return binary.BigEndian.Uint64(b.buf.Next(8))
-
-}
-
-func (b *ByteBuffer) Read(p []byte) (int, error) {
-
-	return b.buf.Read(p)
 
 }
 */
