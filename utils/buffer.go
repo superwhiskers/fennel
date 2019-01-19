@@ -1,6 +1,6 @@
 /*
 
-libninty - nintendo network utility library for golang
+fennel - nintendo network utility library for golang
 copyright (c) 2018 superwhiskers <whiskerdev@protonmail.com>
 
 this program is free software: you can redistribute it and/or modify
@@ -26,7 +26,25 @@ import (
 	//"io"
 	"sync"
 
-	"github.com/superwhiskers/libninty/errors"
+	"github.com/superwhiskers/fennel/errors"
+)
+
+// Endianness represents the endianness of the value read or written
+type Endianness int
+
+const (
+	LittleEndian Endianness = iota
+	BigEndian
+)
+
+// IntegerSize represents the size of the integer read or written
+type IntegerSize int
+
+const (
+	Unsigned16 IntegerSize = iota
+	Unsigned32
+	Unsigned64
+	// TODO: add signed integer support
 )
 
 // ByteBuffer implements a concurrent-safe byte buffer implementation in go

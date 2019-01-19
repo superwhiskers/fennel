@@ -1,6 +1,6 @@
 /*
 
-libninty - nintendo network utility library for golang
+fennel - nintendo network utility library for golang
 Copyright (C) 2018 superwhiskers <whiskerdev@protonmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -18,5 +18,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
-// Package libninty implements a nintendo network api client in go
-package libninty
+// Package fennel implements a generic nintendo network utility library in golang
+package fennel

@@ -1,6 +1,6 @@
 /*
 
-libninty - nintendo network utility library for golang
+fennel - nintendo network utility library for golang
 Copyright (C) 2018 superwhiskers <whiskerdev@protonmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package types
 
-import "github.com/superwhiskers/libninty/utils"
+import "github.com/superwhiskers/fennel/utils"
 
 // Mii contains all of the data that a mii can have
 type Mii struct {

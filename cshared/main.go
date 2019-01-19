@@ -22,7 +22,7 @@ import (
 	"unsafe"
 	"strings"
 
-	"github.com/superwhiskers/libninty"
+	libninty "github.com/superwhiskers/fennel"
 )
 
 //export libninty_newClient
