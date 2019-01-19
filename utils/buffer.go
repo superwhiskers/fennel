@@ -21,9 +21,7 @@ along with this program.  if not, see <https://www.gnu.org/licenses/>.
 package utils
 
 import (
-	//"bytes"
-	//"encoding/binary"
-	//"io"
+	"encoding/binary"
 	"sync"
 
 	"github.com/superwhiskers/fennel/errors"
@@ -50,9 +48,9 @@ const (
 // ByteBuffer implements a concurrent-safe byte buffer implementation in go
 type ByteBuffer struct {
 	buf []byte
-	off int
-	cap int
-	occ int
+	off int64
+	cap int64
+	occ int64
 
 	sync.Mutex
 }
@@ -92,7 +90,7 @@ func NewByteBuffer(slices ...[]byte) (buf *ByteBuffer) {
 /* internal use methods */
 
 // occupied calculates the number of zero bytes in the buffer
-func (b *ByteBuffer) occupied() (occ int) {
+func (b *ByteBuffer) occupied() (occ int64) {
 
 	b.Lock()
 
@@ -113,9 +111,9 @@ func (b *ByteBuffer) occupied() (occ int) {
 }
 
 // write writes a slice of bytes to the buffer at the specified offset
-func (b *ByteBuffer) write(off int, data []byte) {
+func (b *ByteBuffer) write(off int64, data []byte) {
 
-	if (off + len(data)) > b.cap {
+	if (off + int64(len(data))) > b.cap {
 
 		panic(errors.ByteBufferOverwriteError)
 
@@ -123,8 +121,10 @@ func (b *ByteBuffer) write(off int, data []byte) {
 
 	b.Lock()
 
-	for i, byt := range data {
+	var i int64
+	for ii, byt := range data {
 
+		i = int64(ii)
 		if (byt == 0) && (b.buf[off+i] != 0) {
 
 			b.occ--
@@ -145,8 +145,75 @@ func (b *ByteBuffer) write(off int, data []byte) {
 
 }
 
+// writeComplex writes a slice of bytes to the buffer at the specified offset with the specified endianness and integer type
+// TODO: make it properly apply the (u)int<size>-es to the slices, as binary.<endianness>.PutUint<size> expects a single integer type, not a slice
+func (b *ByteBuffer) writeComplex(off int64, idata interface{}, size IntegerSize, endianness Endianness) {
+
+	var data []byte
+	switch size {
+
+	case Unsigned16:
+		adata := idata.([]uint16)
+		data = make([]byte, 2*len(adata))
+
+		switch endianness {
+
+		case LittleEndian:
+			binary.LittleEndian.PutUint16(data, adata)
+
+		case BigEndian:
+			binary.BigEndian.PutUint16(data, adata)
+
+		default:
+			panic(errors.ByteBufferInvalidEndianness)
+
+		}
+
+	case Unsigned32:
+		adata := idata.([]uint32)
+		data = make([]byte, 4*len(adata))
+
+		switch endianness {
+
+		case LittleEndian:
+			binary.LittleEndian.PutUint32(data, adata)
+
+		case BigEndian:
+			binary.BigEndian.PutUint32(data, adata)
+
+		default:
+			panic(errors.ByteBufferInvalidEndianness)
+
+		}
+
+	case Unsigned64:
+		adata := idata.([]uint64)
+		data = make([]byte, 8*len(adata))
+
+		switch endianness {
+
+		case LittleEndian:
+			binary.LittleEndian.PutUint64(data, adata)
+
+		case BigEndian:
+			binary.BigEndian.PutUint64(data, adata)
+
+		default:
+			panic(errors.ByteBufferInvalidEndianness)
+
+		}
+
+	default:
+		panic(errors.ByteBufferInvalidIntegerSize)
+
+	}
+
+	b.write(off, data)
+
+}
+
 // read reads n bytes from the buffer at the specified offset
-func (b *ByteBuffer) read(off int, n int) []byte {
+func (b *ByteBuffer) read(off, n int64) []byte {
 
 	if (off + n) > b.cap {
 
@@ -161,14 +228,17 @@ func (b *ByteBuffer) read(off int, n int) []byte {
 
 }
 
+// readComplex reads a slice of bytes from the buffer at the specified offset with the specified endianness and integer type
+// TODO: add this function
+
 // grow grows the buffer by n bytes
-func (b *ByteBuffer) grow(n int) {
+func (b *ByteBuffer) grow(n int64) {
 
 	b.Lock()
 	defer b.Unlock()
 
 	b.buf = append(b.buf, make([]byte, n)...)
-	b.cap = len(b.buf)
+	b.cap = int64(len(b.buf))
 
 	return
 
@@ -177,7 +247,7 @@ func (b *ByteBuffer) grow(n int) {
 // refresh updates the internal statistics of the byte buffer forcefully
 func (b *ByteBuffer) refresh() {
 
-	b.cap = len(b.buf)
+	b.cap = int64(len(b.buf))
 	b.occ = b.occupied()
 
 	return
@@ -185,7 +255,7 @@ func (b *ByteBuffer) refresh() {
 }
 
 // seek seeks to position off of the byte buffer or relative to the current position
-func (b *ByteBuffer) seek(off int, relative bool) {
+func (b *ByteBuffer) seek(off int64, relative bool) {
 
 	b.Lock()
 	defer b.Unlock()
@@ -214,14 +284,14 @@ func (b *ByteBuffer) Bytes() []byte {
 }
 
 // Capacity returns the capacity of the buffer
-func (b *ByteBuffer) Capacity() int {
+func (b *ByteBuffer) Capacity() int64 {
 
 	return b.cap
 
 }
 
 // Occupied returns the number of currently occupied (nonzero) indexes in the buffer
-func (b *ByteBuffer) Occupied() int {
+func (b *ByteBuffer) Occupied() int64 {
 
 	return b.occ
 
@@ -236,7 +306,7 @@ func (b *ByteBuffer) Refresh() {
 }
 
 // Grow makes the buffer's capacity bigger by n bytes
-func (b *ByteBuffer) Grow(n int) {
+func (b *ByteBuffer) Grow(n int64) {
 
 	b.grow(n)
 	return
@@ -244,7 +314,7 @@ func (b *ByteBuffer) Grow(n int) {
 }
 
 // Seek seeks to position off of the byte buffer or relative to the current position
-func (b *ByteBuffer) Seek(off int, relative bool) {
+func (b *ByteBuffer) Seek(off int64, relative bool) {
 
 	b.seek(off, relative)
 	return
@@ -252,14 +322,14 @@ func (b *ByteBuffer) Seek(off int, relative bool) {
 }
 
 // Read returns the next n bytes from the specified offset without modifying the internal offset value
-func (b *ByteBuffer) Read(off, n int) []byte {
+func (b *ByteBuffer) Read(off, n int64) []byte {
 
 	return b.read(off, n)
 
 }
 
 // ReadNext returns the next n bytes from the current offset and moves the offset foward the amount of bytes read
-func (b *ByteBuffer) ReadNext(n int) (out []byte) {
+func (b *ByteBuffer) ReadNext(n int64) (out []byte) {
 
 	out = b.read(b.off, n)
 	b.seek(n, true)
@@ -268,7 +338,7 @@ func (b *ByteBuffer) ReadNext(n int) (out []byte) {
 }
 
 // WriteByte writes a byte to the buffer at the specified offset without modifying the internal offset value
-func (b *ByteBuffer) WriteByte(off int, data byte) {
+func (b *ByteBuffer) WriteByte(off int64, data byte) {
 
 	b.write(off, []byte{data})
 	return
@@ -276,7 +346,7 @@ func (b *ByteBuffer) WriteByte(off int, data byte) {
 }
 
 // WriteByte writes bytes to the buffer at the specified offset without modifying the internal offset value
-func (b *ByteBuffer) WriteBytes(off int, data []byte) {
+func (b *ByteBuffer) WriteBytes(off int64, data []byte) {
 
 	b.write(off, data)
 	return
@@ -296,7 +366,7 @@ func (b *ByteBuffer) WriteByteNext(data byte) {
 func (b *ByteBuffer) WriteBytesNext(data []byte) {
 
 	b.write(b.off, data)
-	b.seek(len(data), true)
+	b.seek(int64(len(data)), true)
 	return
 
 }
