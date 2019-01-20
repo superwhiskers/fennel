@@ -44,4 +44,12 @@ var (
 		scope: "bytebuffer",
 		error: "write exceeds buffer capacity",
 	}
+	ByteBufferInvalidIntegerSize = FennelError{
+		scope: "bytebuffer",
+		error: "invalid integer size specified",
+	}
+	ByteBufferInvalidEndianness = FennelError{
+		scope: "bytebuffer",
+		error: "invalid endianness specified",
+	}
 )
