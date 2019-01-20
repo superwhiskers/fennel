@@ -39,7 +39,8 @@ const (
 type IntegerSize int
 
 const (
-	Unsigned16 IntegerSize = iota
+	Unsigned8 IntegerSize = iota
+	Unsigned16
 	Unsigned32
 	Unsigned64
 )
@@ -150,6 +151,12 @@ func (b *ByteBuffer) writeComplex(off int64, idata interface{}, size IntegerSize
 	var data []byte
 	switch size {
 
+	case Unsigned8:
+		// literally just a byte array
+		// if you did this, you should probably be using the regular write methods bc those are more efficient than this one
+		data = idata.([]byte)
+		break
+
 	case Unsigned16:
 		var tdata []byte
 		adata := idata.([]uint16)
@@ -167,6 +174,7 @@ func (b *ByteBuffer) writeComplex(off int64, idata interface{}, size IntegerSize
 				data[1+(i*2)] = tdata[1]
 
 			}
+			break
 
 		case BigEndian:
 			for i := 0; i < len(adata); i++ {
@@ -178,11 +186,13 @@ func (b *ByteBuffer) writeComplex(off int64, idata interface{}, size IntegerSize
 				data[1+(i*2)] = tdata[1]
 
 			}
+			break
 
 		default:
 			panic(errors.ByteBufferInvalidEndianness)
 
 		}
+		break
 
 	case Unsigned32:
 		var tdata []byte
@@ -203,6 +213,7 @@ func (b *ByteBuffer) writeComplex(off int64, idata interface{}, size IntegerSize
 				data[3+(i*4)] = tdata[3]
 
 			}
+			break
 
 		case BigEndian:
 			for i := 0; i < len(adata); i++ {
@@ -216,11 +227,13 @@ func (b *ByteBuffer) writeComplex(off int64, idata interface{}, size IntegerSize
 				data[3+(i*4)] = tdata[3]
 
 			}
+			break
 
 		default:
 			panic(errors.ByteBufferInvalidEndianness)
 
 		}
+		break
 
 	case Unsigned64:
 		var tdata []byte
@@ -245,6 +258,7 @@ func (b *ByteBuffer) writeComplex(off int64, idata interface{}, size IntegerSize
 				data[7+(i*8)] = tdata[7]
 
 			}
+			break
 
 		case BigEndian:
 			for i := 0; i < len(adata); i++ {
@@ -262,11 +276,13 @@ func (b *ByteBuffer) writeComplex(off int64, idata interface{}, size IntegerSize
 				data[7+(i*8)] = tdata[7]
 
 			}
+			break
 
 		default:
 			panic(errors.ByteBufferInvalidEndianness)
 
 		}
+		break
 
 	default:
 		panic(errors.ByteBufferInvalidIntegerSize)
@@ -294,7 +310,9 @@ func (b *ByteBuffer) read(off, n int64) []byte {
 }
 
 // readComplex reads a slice of bytes from the buffer at the specified offset with the specified endianness and integer type
-// TODO: add this function
+func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endianness) []interface{} {
+
+}
 
 // grow grows the buffer by n bytes
 func (b *ByteBuffer) grow(n int64) {
