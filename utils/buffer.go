@@ -39,7 +39,7 @@ const (
 type IntegerSize int
 
 const (
-	Unsigned8 = 1
+	Unsigned8  = 1
 	Unsigned16 = 2
 	Unsigned32 = 4
 	Unsigned64 = 8
@@ -50,7 +50,6 @@ type ByteBuffer struct {
 	buf []byte
 	off int64
 	cap int64
-	occ int64
 
 	sync.Mutex
 }
@@ -89,27 +88,6 @@ func NewByteBuffer(slices ...[]byte) (buf *ByteBuffer) {
 
 /* internal use methods */
 
-// occupied calculates the number of zero bytes in the buffer
-func (b *ByteBuffer) occupied() (occ int64) {
-
-	b.Lock()
-
-	for _, byt := range b.buf {
-
-		if byt == 0 {
-
-			occ++
-
-		}
-
-	}
-
-	b.Unlock()
-
-	return
-
-}
-
 // write writes a slice of bytes to the buffer at the specified offset
 func (b *ByteBuffer) write(off int64, data []byte) {
 
@@ -121,21 +99,9 @@ func (b *ByteBuffer) write(off int64, data []byte) {
 
 	b.Lock()
 
-	var i int64
-	for ii, byt := range data {
+	for i, byt := range data {
 
-		i = int64(ii)
-		if (byt == 0) && (b.buf[off+i] != 0) {
-
-			b.occ--
-
-		} else if (byt != 0) && (b.buf[off+i] == 0) {
-
-			b.occ++
-
-		}
-
-		b.buf[off+i] = byt
+		b.buf[off+int64(i)] = byt
 
 	}
 
@@ -312,60 +278,22 @@ func (b *ByteBuffer) read(off, n int64) []byte {
 // readComplex reads a slice of bytes from the buffer at the specified offset with the specified endianness and integer type
 func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endianness) interface{} {
 
-	switch size {
-
-	case Unsigned8:
-		// i mean really, this is really inefficient
-		// there are no hecking sanity checks required here
-		break
-
-	case Unsigned16:
-		if (n % 2) != 0 {
-
-			panic(errors.ByteBufferInvalidByteCount)
-
-		}
-		break
-
-	case Unsigned32:
-		if (n % 4) != 0 {
-
-			panic(errors.ByteBufferInvalidByteCount)
-
-		}
-		break
-
-	case Unsigned64:
-		if (n % 8) != 0 {
-
-			panic(errors.ByteBufferInvalidByteCount)
-
-		}
-		break
-
-	default:
-		panic(errors.ByteBufferInvalidIntegerSize)
-
-	}
-
-	data := b.Read(off, n)
+	data := b.read(off, n)
 
 	switch size {
 
 	case Unsigned8:
-		// if you actually request a byte array from this complex read function,
-		// i hope your parents are nice people because you just killed another gopher
 		return data
-		
+
 	case Unsigned16:
-		idata := make([]uint16, n/2)
+		idata := make([]uint16, n)
 
 		switch endianness {
 
 		case LittleEndian:
 			for i := int64(0); i < n; i++ {
 
-				idata[i] = binary.LittleEndian.Uint16(data[i*2:((i+1)*2)-1])
+				idata[i] = binary.LittleEndian.Uint16(data[i*2 : (i+1)*2])
 
 			}
 			break
@@ -373,7 +301,7 @@ func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endi
 		case BigEndian:
 			for i := int64(0); i < n; i++ {
 
-				idata[i] = binary.BigEndian.Uint16(data[i*2:((i+1)*2)-1])
+				idata[i] = binary.BigEndian.Uint16(data[i*2 : (i+1)*2])
 
 			}
 			break
@@ -386,14 +314,14 @@ func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endi
 		return idata
 
 	case Unsigned32:
-		idata := make([]uint32, n/4)
+		idata := make([]uint32, n)
 
 		switch endianness {
 
 		case LittleEndian:
 			for i := int64(0); i < n; i++ {
 
-				idata[i] = binary.LittleEndian.Uint32(data[i*4:((i+1)*4)-1])
+				idata[i] = binary.LittleEndian.Uint32(data[i*4 : (i+1)*4])
 
 			}
 			break
@@ -401,7 +329,7 @@ func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endi
 		case BigEndian:
 			for i := int64(0); i < n; i++ {
 
-				idata[i] = binary.BigEndian.Uint32(data[i*4:((i+1)*4)-1])
+				idata[i] = binary.BigEndian.Uint32(data[i*4 : (i+1)*4])
 
 			}
 			break
@@ -413,16 +341,15 @@ func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endi
 
 		return idata
 
-
 	case Unsigned64:
-		idata := make([]uint64, n/8)
+		idata := make([]uint64, n)
 
 		switch endianness {
 
 		case LittleEndian:
 			for i := int64(0); i < n; i++ {
 
-				idata[i] = binary.LittleEndian.Uint64(data[i*8:((i+1)*8)-1])
+				idata[i] = binary.LittleEndian.Uint64(data[i*8 : (i+1)*8])
 
 			}
 			break
@@ -430,7 +357,7 @@ func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endi
 		case BigEndian:
 			for i := int64(0); i < n; i++ {
 
-				idata[i] = binary.BigEndian.Uint64(data[i*8:((i+1)*8)-1])
+				idata[i] = binary.BigEndian.Uint64(data[(i * 8) : (i+1)*8])
 
 			}
 			break
@@ -444,9 +371,9 @@ func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endi
 
 	default:
 		panic(errors.ByteBufferInvalidIntegerSize)
-		
+
 	}
-	
+
 }
 
 // grow grows the buffer by n bytes
@@ -465,8 +392,10 @@ func (b *ByteBuffer) grow(n int64) {
 // refresh updates the internal statistics of the byte buffer forcefully
 func (b *ByteBuffer) refresh() {
 
+	b.Lock()
+	defer b.Unlock()
+
 	b.cap = int64(len(b.buf))
-	b.occ = b.occupied()
 
 	return
 
@@ -497,11 +426,11 @@ func (b *ByteBuffer) after(off ...int64) int64 {
 
 	if len(off) == 0 {
 
-		return b.cap - (b.off + 1)
+		return b.cap - b.off
 
 	} else {
 
-		return b.cap - (off[0] + 1)
+		return b.cap - off[0]
 
 	}
 
@@ -520,13 +449,6 @@ func (b *ByteBuffer) Bytes() []byte {
 func (b *ByteBuffer) Capacity() int64 {
 
 	return b.cap
-
-}
-
-// Occupied returns the number of currently occupied (nonzero) indexes in the buffer
-func (b *ByteBuffer) Occupied() int64 {
-
-	return b.occ
 
 }
 
@@ -569,7 +491,7 @@ func (b *ByteBuffer) After(off ...int64) int64 {
 }
 
 // Read returns the next n bytes from the specified offset without modifying the internal offset value
-func (b *ByteBuffer) Read(off, n int64) []byte {
+func (b *ByteBuffer) ReadBytes(off, n int64) []byte {
 
 	return b.read(off, n)
 
@@ -583,7 +505,7 @@ func (b *ByteBuffer) ReadComplex(off, n int64, size IntegerSize, endianness Endi
 }
 
 // ReadNext returns the next n bytes from the current offset and moves the offset foward the amount of bytes read
-func (b *ByteBuffer) ReadNext(n int64) (out []byte) {
+func (b *ByteBuffer) ReadBytesNext(n int64) (out []byte) {
 
 	out = b.read(b.off, n)
 	b.seek(n, true)
@@ -646,7 +568,23 @@ func (b *ByteBuffer) WriteBytesNext(data []byte) {
 func (b *ByteBuffer) WriteComplexNext(data interface{}, size IntegerSize, endianness Endianness) {
 
 	b.writeComplex(b.off, data, size, endianness)
-	b.seek(int64(len(data.([]interface{}))*int(size)), true)
+
+	switch size {
+
+	case Unsigned8:
+		b.seek(int64(len(data.([]uint8))*int(size)), true)
+
+	case Unsigned16:
+		b.seek(int64(len(data.([]uint16))*int(size)), true)
+
+	case Unsigned32:
+		b.seek(int64(len(data.([]uint32))*int(size)), true)
+
+	case Unsigned64:
+		b.seek(int64(len(data.([]uint64))*int(size)), true)
+
+	}
+
 	return
 
 }
