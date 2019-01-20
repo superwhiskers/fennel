@@ -35,14 +35,14 @@ const (
 	BigEndian
 )
 
-// IntegerSize represents the size of the integer read or written
+// IntegerSize represents the size of the integer read or written (in bytes)
 type IntegerSize int
 
 const (
-	Unsigned8 IntegerSize = iota
-	Unsigned16
-	Unsigned32
-	Unsigned64
+	Unsigned8 = 1
+	Unsigned16 = 2
+	Unsigned32 = 4
+	Unsigned64 = 8
 )
 
 // ByteBuffer implements a concurrent-safe byte buffer implementation in go
@@ -546,11 +546,27 @@ func (b *ByteBuffer) Read(off, n int64) []byte {
 
 }
 
+// ReadComplex returns the next n uint8/uint16/uint32/uint64-s from the specified offset without modifying the internal offset value
+func (b *ByteBuffer) ReadComplex(off, n int64, size IntegerSize, endianness Endianness) interface{} {
+
+	return b.readComplex(off, n, size, endianness)
+
+}
+
 // ReadNext returns the next n bytes from the current offset and moves the offset foward the amount of bytes read
 func (b *ByteBuffer) ReadNext(n int64) (out []byte) {
 
 	out = b.read(b.off, n)
 	b.seek(n, true)
+	return
+
+}
+
+// ReadComplexNext returns the next n uint8/uint16/uint32/uint64-s from the current offset and moves the offset foward the amount of bytes read
+func (b *ByteBuffer) ReadComplexNext(n int64, size IntegerSize, endianness Endianness) (out interface{}) {
+
+	out = b.readComplex(b.off, n, size, endianness)
+	b.seek(n*int64(size), true)
 	return
 
 }
@@ -567,6 +583,14 @@ func (b *ByteBuffer) WriteByte(off int64, data byte) {
 func (b *ByteBuffer) WriteBytes(off int64, data []byte) {
 
 	b.write(off, data)
+	return
+
+}
+
+// WriteComplex writes a uint8/uint16/uint32/uint64 to the buffer at the specified offset without modifying the internal offset value
+func (b *ByteBuffer) WriteComplex(off int64, data interface{}, size IntegerSize, endianness Endianness) {
+
+	b.writeComplex(off, data, size, endianness)
 	return
 
 }
@@ -589,41 +613,11 @@ func (b *ByteBuffer) WriteBytesNext(data []byte) {
 
 }
 
-/*
+// WriteComplexNext writes a uint8/uint16/uint32/uint64 to the buffer at the current offset and moves the offset foward the amount of bytes written
+func (b *ByteBuffer) WriteComplexNext(data interface{}, size IntegerSize, endianness Endianness) {
 
-func (b *ByteBuffer) Nextu16Little() uint16 {
-
-	return binary.LittleEndian.Uint16(b.buf.Next(2))
-
-}
-
-func (b *ByteBuffer) Nextu16Big() uint16 {
-
-	return binary.BigEndian.Uint16(b.buf.Next(2))
+	b.writeComplex(b.off, data, size, endianness)
+	b.seek(int64(len(data.([]interface{}))*int(size)), true)
+	return
 
 }
-
-func (b *ByteBuffer) Nextu32Little() uint32 {
-
-	return binary.LittleEndian.Uint32(b.buf.Next(4))
-
-}
-
-func (b *ByteBuffer) Nextu32Big() uint32 {
-
-	return binary.BigEndian.Uint32(b.buf.Next(4))
-
-}
-
-func (b *ByteBuffer) Nextu64Little() uint64 {
-
-	return binary.LittleEndian.Uint64(b.buf.Next(8))
-
-}
-
-func (b *ByteBuffer) Nextu64Big() uint64 {
-
-	return binary.BigEndian.Uint64(b.buf.Next(8))
-
-}
-*/
