@@ -52,4 +52,8 @@ var (
 		scope: "bytebuffer",
 		error: "invalid endianness specified",
 	}
+	ByteBufferInvalidByteCount = FennelError{
+		scope: "bytebuffer",
+		error: "invalid byte count requested",
+	}
 )

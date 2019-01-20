@@ -298,7 +298,7 @@ func (b *ByteBuffer) read(off, n int64) []byte {
 
 	if (off + n) > b.cap {
 
-		panic(errors.ByteBufferOverwriteError)
+		panic(errors.ByteBufferOverreadError)
 
 	}
 
@@ -310,8 +310,143 @@ func (b *ByteBuffer) read(off, n int64) []byte {
 }
 
 // readComplex reads a slice of bytes from the buffer at the specified offset with the specified endianness and integer type
-func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endianness) []interface{} {
+func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endianness) interface{} {
 
+	switch size {
+
+	case Unsigned8:
+		// i mean really, this is really inefficient
+		// there are no hecking sanity checks required here
+		break
+
+	case Unsigned16:
+		if (n % 2) != 0 {
+
+			panic(errors.ByteBufferInvalidByteCount)
+
+		}
+		break
+
+	case Unsigned32:
+		if (n % 4) != 0 {
+
+			panic(errors.ByteBufferInvalidByteCount)
+
+		}
+		break
+
+	case Unsigned64:
+		if (n % 8) != 0 {
+
+			panic(errors.ByteBufferInvalidByteCount)
+
+		}
+		break
+
+	default:
+		panic(errors.ByteBufferInvalidIntegerSize)
+
+	}
+
+	data := b.Read(off, n)
+
+	switch size {
+
+	case Unsigned8:
+		// if you actually request a byte array from this complex read function,
+		// i hope your parents are nice people because you just killed another gopher
+		return data
+		
+	case Unsigned16:
+		idata := make([]uint16, n/2)
+
+		switch endianness {
+
+		case LittleEndian:
+			for i := int64(0); i < n; i++ {
+
+				idata[i] = binary.LittleEndian.Uint16(data[i*2:((i+1)*2)-1])
+
+			}
+			break
+
+		case BigEndian:
+			for i := int64(0); i < n; i++ {
+
+				idata[i] = binary.BigEndian.Uint16(data[i*2:((i+1)*2)-1])
+
+			}
+			break
+
+		default:
+			panic(errors.ByteBufferInvalidEndianness)
+
+		}
+
+		return idata
+
+	case Unsigned32:
+		idata := make([]uint32, n/4)
+
+		switch endianness {
+
+		case LittleEndian:
+			for i := int64(0); i < n; i++ {
+
+				idata[i] = binary.LittleEndian.Uint32(data[i*4:((i+1)*4)-1])
+
+			}
+			break
+
+		case BigEndian:
+			for i := int64(0); i < n; i++ {
+
+				idata[i] = binary.BigEndian.Uint32(data[i*4:((i+1)*4)-1])
+
+			}
+			break
+
+		default:
+			panic(errors.ByteBufferInvalidEndianness)
+
+		}
+
+		return idata
+
+
+	case Unsigned64:
+		idata := make([]uint64, n/8)
+
+		switch endianness {
+
+		case LittleEndian:
+			for i := int64(0); i < n; i++ {
+
+				idata[i] = binary.LittleEndian.Uint64(data[i*8:((i+1)*8)-1])
+
+			}
+			break
+
+		case BigEndian:
+			for i := int64(0); i < n; i++ {
+
+				idata[i] = binary.BigEndian.Uint64(data[i*8:((i+1)*8)-1])
+
+			}
+			break
+
+		default:
+			panic(errors.ByteBufferInvalidEndianness)
+
+		}
+
+		return idata
+
+	default:
+		panic(errors.ByteBufferInvalidIntegerSize)
+		
+	}
+	
 }
 
 // grow grows the buffer by n bytes
