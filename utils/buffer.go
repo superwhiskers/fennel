@@ -492,6 +492,21 @@ func (b *ByteBuffer) seek(off int64, relative bool) {
 
 }
 
+// after returns the amount of bytes located after the current position or the specified one
+func (b *ByteBuffer) after(off ...int64) int64 {
+
+	if len(off) == 0 {
+
+		return b.cap - (b.off + 1)
+
+	} else {
+
+		return b.cap - (off[0] + 1)
+
+	}
+
+}
+
 /* public methods */
 
 // Bytes returns the internal byte slice of the buffer
@@ -512,6 +527,13 @@ func (b *ByteBuffer) Capacity() int64 {
 func (b *ByteBuffer) Occupied() int64 {
 
 	return b.occ
+
+}
+
+// Offset returns the current offset
+func (b *ByteBuffer) Offset() int64 {
+
+	return b.off
 
 }
 
@@ -536,6 +558,13 @@ func (b *ByteBuffer) Seek(off int64, relative bool) {
 
 	b.seek(off, relative)
 	return
+
+}
+
+// After returns the amount of bytes located after the current position or the specified one
+func (b *ByteBuffer) After(off ...int64) int64 {
+
+	return b.after(off...)
 
 }
 
