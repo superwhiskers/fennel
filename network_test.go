@@ -31,7 +31,7 @@ var clientInfo = ClientInformation{
 	ClientID:     "ea25c66c26b403376b4c5ed94ab9cdea",
 	ClientSecret: "d137be62cb6a2b831cad8c013b92fb55",
 	DeviceCert:   "",
-	Environment:  "",
+	Environment:  "L1",
 	Country:      "US",
 	Region:       "2",
 	SysVersion:   "1111",

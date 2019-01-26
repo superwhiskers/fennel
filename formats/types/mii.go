@@ -217,8 +217,28 @@ func swapMiiEndiannessToLittle(data []byte) []byte {
 // ParseMii takes a mii as a byte array and parses it to a Mii
 func ParseMii(miiByte []byte) Mii {
 
-	/*buffer := utils.NewByteBuffer(swapMiiEndiannessToLittle(miiByte[:0x60]))
-	mii := Mii{}*/
+	buf := utils.NewByteBuffer(swapMiiEndiannessToLittle(miiByte[:0x61]))
+	mii := Mii{}
+
+	// TODO: implement this after bytefields get properly implemented in the utils package
+	/*
+		mii.BirthPlatform = buf.ReadBytesNext(4)
+		mii.Unknown1 = buf.ReadBytesNext(4)
+		mii.Unknown2 = buf.ReadBytesNext(4)
+		mii.Unknown3 = buf.ReadBytesNext(4)
+		mii.FontRegion = buf.ReadBytesNext(4)
+		mii.RegionMove = buf.ReadBytesNext(2)
+		mii.Unknown4 = buf.ReadBytesNext(1)[0]
+		if buf.ReadBytesNext(1)[0] == 0x00 {
+
+			mii.Copyable = false
+
+		} else {
+
+			mii.Copyable = true
+
+		}
+	*/
 
 	return NilMii
 

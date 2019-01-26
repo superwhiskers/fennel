@@ -54,12 +54,12 @@ type ByteBuffer struct {
 	sync.Mutex
 }
 
-// NewByteBuffer initilaizes a new ByteBuffer with the provided byte slices stored inside in the order provided
+// NewByteBuffer initilaizes a new ByteBuffer with the provided byte slice(s) stored inside in the order provided
 func NewByteBuffer(slices ...[]byte) (buf *ByteBuffer) {
 
 	buf = &ByteBuffer{
 		buf: []byte{},
-		off: 0,
+		off: 0x00,
 	}
 
 	switch len(slices) {
@@ -80,7 +80,7 @@ func NewByteBuffer(slices ...[]byte) (buf *ByteBuffer) {
 
 	}
 
-	buf.Refresh()
+	buf.refresh()
 
 	return
 
@@ -380,10 +380,12 @@ func (b *ByteBuffer) readComplex(off, n int64, size IntegerSize, endianness Endi
 func (b *ByteBuffer) grow(n int64) {
 
 	b.Lock()
-	defer b.Unlock()
 
 	b.buf = append(b.buf, make([]byte, n)...)
-	b.cap = int64(len(b.buf))
+
+	b.Unlock()
+
+	b.refresh()
 
 	return
 
@@ -401,7 +403,7 @@ func (b *ByteBuffer) refresh() {
 
 }
 
-// seek seeks to position off of the byte buffer or relative to the current position
+// seek seeks to position off of the byte buffer relative to the current position or exact
 func (b *ByteBuffer) seek(off int64, relative bool) {
 
 	b.Lock()
@@ -475,7 +477,7 @@ func (b *ByteBuffer) Grow(n int64) {
 
 }
 
-// Seek seeks to position off of the byte buffer or relative to the current position
+// Seek seeks to position off of the byte buffer relative to the current position or exact
 func (b *ByteBuffer) Seek(off int64, relative bool) {
 
 	b.seek(off, relative)

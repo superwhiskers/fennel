@@ -1,8 +1,8 @@
 # fennel
 
-## nintendo network utility library for golang  
+## nintendo network utility library for golang
 
-[![GoDoc](https://godoc.org/github.com/superwhiskers/fennel?status.svg)](https://godoc.org/github.com/superwhiskers/fennel)
+[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/superwhiskers/fennel)![license](https://img.shields.io/badge/license-lgpl-green.svg?style=flat-square)![version](https://img.shields.io/github/tag/superwhiskers/fennel.svg?style=flat-square)
 
 ### projects that use this
 
