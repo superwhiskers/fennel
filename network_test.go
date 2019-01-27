@@ -39,6 +39,7 @@ var clientInfo = ClientInformation{
 	DeviceID:     "1",
 	DeviceType:   "",
 	PlatformID:   "1",
+	FPDVersion:   "0000",
 }
 
 func TestNewClient(t *testing.T) {

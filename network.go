@@ -28,17 +28,27 @@ import (
 
 // ClientInformation holds data for headers sent in requests to nintendo network
 type ClientInformation struct {
-	ClientID     string
-	ClientSecret string
-	DeviceCert   string
-	Environment  string
-	Country      string
-	Region       string
-	SysVersion   string
-	Serial       string
-	DeviceID     string
-	DeviceType   string
-	PlatformID   string
+	/* (mostly) constant information */
+	PlatformID   string // this is pretty much always "1"
+	DeviceType   string // this is either 1 or 2. 1 being debug, 2 being retail
+	ClientID     string // this is pretty much always "a2efa818a34fa16b8afbc8a74eba3eda"
+	ClientSecret string // this is pretty much always "c91cdb5658bd4954ade78533a339cf9a"
+	FPDVersion   string // this is pretty much always "0000"
+	Environment  string // this is pretty much always "L1"
+
+	/* fluctuating information */
+	DeviceID   string // device id obtained from your console
+	Serial     string // string representing the serial number of your console
+	SysVersion string // unsigned integer representing your system version
+	Region     string // 1 = JPN, 2 = USA, 4 = EUR, 8 = AUS, 16 = CHN, 32 = KOR, 64 = TWN
+	Country    string // two-letter country code
+	DeviceCert string // device certificate obtained from your console
+}
+
+// ApplicationInformation holds data about the application accessing the api
+type ApplicationInformation struct {
+	TitleID            uint64
+	ApplicationVersion uint64
 }
 
 // Client implements a client for nintendo network
@@ -80,6 +90,7 @@ func NewClient(accountServer string, certificatePath string, keyPath string, cli
 func (c *Client) Do(request *fasthttp.Request, response *fasthttp.Response) error {
 
 	request.Header.Set("X-Nintendo-Client-ID", c.ClientInformation.ClientID)
+	request.Header.Set("X-Nintendo-FPD-Version", c.ClientInformation.FPDVersion)
 	request.Header.Set("X-Nintendo-Client-Secret", c.ClientInformation.ClientSecret)
 	request.Header.Set("X-Nintendo-Platform-ID", c.ClientInformation.PlatformID)
 	request.Header.Set("X-Nintendo-Device-Type", c.ClientInformation.DeviceType)
@@ -90,8 +101,6 @@ func (c *Client) Do(request *fasthttp.Request, response *fasthttp.Response) erro
 	request.Header.Set("X-Nintendo-Country", c.ClientInformation.Country)
 	request.Header.Set("X-Nintendo-Environment", c.ClientInformation.Environment)
 	request.Header.Set("X-Nintendo-Device-Cert", c.ClientInformation.DeviceCert)
-
-	request.Header.Set("X-Nintendo-FPD-Version", "0000")
 
 	return c.HTTPClient.Do(request, response)
 

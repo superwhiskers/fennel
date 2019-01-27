@@ -20,7 +20,11 @@ along with this program.  if not, see <https://www.gnu.org/licenses/>.
 
 package utils
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/superwhiskers/fennel/errors"
+)
 
 /* utilities */
 
@@ -77,6 +81,12 @@ func NewBitfield(bitfields ...byte) (b *Bitfield) {
 // readbit reads a bit from the bitfield at the specified offset
 func (b *Bitfield) readbit(off int64) byte {
 
+	if off > (b.cap - 1) {
+
+		panic(errors.BitfieldOverreadError)
+
+	}
+
 	b.Lock()
 	defer b.Unlock()
 
@@ -88,6 +98,12 @@ func (b *Bitfield) readbit(off int64) byte {
 // readbits reads n bits from the bitfield at the specified offset
 func (b *Bitfield) readbits(off, n int64) (v int64) {
 
+	if (off + n) > b.cap {
+
+		panic(errors.BitfieldOverreadError)
+
+	}
+
 	for i := int64(0); i < n; i++ {
 
 		v = (v << uint64(1)) | int64(b.readbit(off+i))
@@ -95,6 +111,34 @@ func (b *Bitfield) readbits(off, n int64) (v int64) {
 	}
 
 	return
+
+}
+
+// setbit sets a bit in the bitfield to the specified value
+func (b *Bitfield) setbit(off, data int64) {
+
+	if off > (b.cap - 1) {
+
+		panic(errors.BitfieldOverwriteError)
+
+	}
+
+	if data != 1 || data != 0 {
+
+		panic(errors.BitfieldInvalidBit)
+
+	}
+
+	i, o := (off / 8), (off % 8)
+	switch data {
+
+	case 0:
+		b.btf[i] &= ^(1 << uint(o))
+
+	case 1:
+		b.btf[i] |= (1 << uint(o))
+
+	}
 
 }
 

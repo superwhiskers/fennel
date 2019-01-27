@@ -59,14 +59,12 @@ func (e ErrorXMLError) Error() string {
 }
 
 // ParseErrorXML parses a nintendo network error xml sheet to an ErrorXML struct
-func ParseErrorXML(errorXML []byte) (ErrorXML, error) {
+func ParseErrorXML(errorXML []byte) (errorXMLParsed ErrorXML, err error) {
 
-	var errorXMLParsed ErrorXML
-
-	err := xml.Unmarshal(errorXML, &errorXMLParsed)
+	err = xml.Unmarshal(errorXML, &errorXMLParsed)
 	if err != nil {
 
-		return ErrorXML{}, err
+		return NilErrorXML, err
 
 	}
 

@@ -33,9 +33,30 @@ type MappedIDsXML struct {
 	MappedIDs []MappedIDsXMLMappedID `xml:"mapped_id"`
 }
 
+// FormatXML formats the MappedIDsXML as a byte array
+func (m MappedIDsXML) FormatXML() ([]byte, error) {
+
+	mappedidsxml, err := xml.Marshal(m)
+	return mappedidsxml, err
+
+}
+
 // MappedIDsXMLMappedID represents a mapped id of a MappedIDsXML
 type MappedIDsXMLMappedID struct {
 	InID  string `xml:"in_id"`
 	OutID string `xml:"out_id"`
 }
 
+// ParseMappedIDsXML parses a nintendo network mapped ids xml to a MappedIDsXML
+func ParseMappedIDsXML(mappedidsXML []byte) (mappedidsXMLParsed MappedIDsXML, err error) {
+
+	err = xml.Unmarshal(mappedidsXML, &mappedidsXMLParsed)
+	if err != nil {
+
+		return NilMappedIDsXML, err
+
+	}
+
+	return mappedidsXMLParsed, nil
+
+}

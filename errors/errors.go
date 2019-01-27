@@ -56,4 +56,16 @@ var (
 		scope: "bytebuffer",
 		error: "invalid byte count requested",
 	}
+	BitfieldInvalidBit = FennelError{
+		scope: "bitfield",
+		error: "invalid bit value specified",
+	}
+	BitfieldOverreadError = FennelError{
+		scope: "bitfield",
+		error: "read exceeds bitfield capacity",
+	}
+	BitfieldOverwriteError = FennelError{
+		scope: "bitfield",
+		error: "write exceeds bitfield capacity",
+	}
 )

@@ -66,20 +66,13 @@ func (a AgreementXMLAgreement) PublishDate() (time.Time, error) {
 
 }
 
-// CData represents cdata in xml
-type CData struct {
-	Data string `xml:",cdata"`
-}
-
 // ParseAgreementXML parses a nintendo network agreement xml to an AgreementXML
-func ParseAgreementXML(agreementXML []byte) (AgreementXML, error) {
+func ParseAgreementXML(agreementXML []byte) (agreementXMLParsed AgreementXML, err error) {
 
-	var agreementXMLParsed AgreementXML
-
-	err := xml.Unmarshal(agreementXML, &agreementXMLParsed)
+	err = xml.Unmarshal(agreementXML, &agreementXMLParsed)
 	if err != nil {
 
-		return AgreementXML{}, err
+		return NilAgreementXML, err
 
 	}
 

@@ -18,13 +18,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
-package errors
+package xmls
 
-const (
-	BadRequestError         = "1600"
-	AccountIDExistsError    = "0100"
-	InvalidApplicationError = "0004"
-	InvalidAccountIDError   = "1104"
-	InvalidVersionError     = "1101"
-	InvalidParameterError   = "0002"
-)
+// CData represents cdata in xml
+type CData struct {
+	Data string `xml:",cdata"`
+}
