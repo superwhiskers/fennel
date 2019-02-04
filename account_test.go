@@ -42,7 +42,7 @@ var clientInfo = ClientInformation{
 	FPDVersion:   "0000",
 }
 
-func TestNewClient(t *testing.T) {
+func TestNewAccountServerClient(t *testing.T) {
 
 	keyPair, err := tls.LoadX509KeyPair("keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem")
 	if err != nil {
@@ -51,8 +51,8 @@ func TestNewClient(t *testing.T) {
 
 	}
 
-	expectedOutput := &Client{
-		AccountServerAPIEndpoint: "https://account.nintendo.net/v1/api",
+	expectedOutput := &AccountServerClient{
+		APIEndpoint: "https://account.nintendo.net/v1/api",
 		HTTPClient: &fasthttp.Client{
 			TLSConfig: &tls.Config{
 				Certificates:       []tls.Certificate{keyPair},
@@ -63,7 +63,7 @@ func TestNewClient(t *testing.T) {
 		ClientInformation: clientInfo,
 	}
 
-	output, err := NewClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
+	output, err := NewAccountServerClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
@@ -80,7 +80,7 @@ func TestNewClient(t *testing.T) {
 
 func TestDoesUserExist(t *testing.T) {
 
-	client, err := NewClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
+	client, err := NewAccountServerClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
@@ -104,7 +104,7 @@ func TestDoesUserExist(t *testing.T) {
 
 func TestGetEULA(t *testing.T) {
 
-	client, err := NewClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
+	client, err := NewAccountServerClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
