@@ -62,12 +62,8 @@ func NewBitfield(bitfields ...byte) (b *Bitfield) {
 		off: 0x00,
 	}
 
-	switch len(bitfields) {
+	if len(bitfields) != 0 {
 
-	case 0:
-		break
-
-	default:
 		b.btf = bitfields
 
 	}
@@ -92,7 +88,7 @@ func (b *Bitfield) readbit(off int64) byte {
 	b.Lock()
 	defer b.Unlock()
 
-	i, o := (off / 8), uint(7-(off % 8))
+	i, o := (off / 8), uint(7-(off%8))
 	return atob((b.btf[i] & (1 << o)) != 0)
 
 }
@@ -133,8 +129,8 @@ func (b *Bitfield) setbit(off, data int64) {
 
 	b.Lock()
 	defer b.Unlock()
-	
-	i, o := (off / 8), uint(7 - (off % 8))
+
+	i, o := (off / 8), uint(7-(off%8))
 	switch data {
 
 	case 0:
@@ -150,7 +146,7 @@ func (b *Bitfield) setbit(off, data int64) {
 // setbits sets n bits in the bitfield to the specified value at the specified offset
 func (b *Bitfield) setbits(off, data, n int64) {
 
-	if off + n > (b.cap - 1) {
+	if off+n > (b.cap - 1) {
 
 		panic(errors.BitfieldOverwriteError)
 
@@ -158,7 +154,66 @@ func (b *Bitfield) setbits(off, data, n int64) {
 
 	for i := int64(0); i < n; i++ {
 
-		b.setbit(off+i, (data >> uint64(n - i - 1)) & 1)
+		b.setbit(off+i, (data>>uint64(n-i-1))&1)
+
+	}
+
+}
+
+// flipbit flips a bit in the bitfield
+func (b *Bitfield) flipbit(off int64) {
+
+	if off > (b.cap - 1) {
+
+		panic(errors.BitfieldOverwriteError)
+
+	}
+
+	b.Lock()
+	defer b.Unlock()
+
+	i, o := (off / 8), uint(7-(off%8))
+	b.btf[i] ^= (1 << o)
+
+}
+
+// clear sets all bitfield values to 0
+func (b *Bitfield) clear() {
+
+	b.Lock()
+	defer b.Unlock()
+	
+	for i := range b.btf {
+
+		b.btf[i] = 0
+
+	}
+
+}
+
+// setall sets all bitfield values to 1
+func (b *Bitfield) setall() {
+
+	b.Lock()
+	defer b.Unlock()
+
+	for i := range b.btf {
+
+		b.btf[i] = 0xFF
+
+	}
+
+}
+
+// flipall flips all of the bitfield's bits
+func (b *Bitfield) flipall() {
+
+	b.Lock()
+	defer b.Unlock()
+
+	for i := range b.btf {
+
+		b.btf[i] = ^b.btf[i]
 
 	}
 
@@ -342,6 +397,47 @@ func (b *Bitfield) SetBitsNext(data, n int64) {
 
 	b.setbits(b.off, data, n)
 	b.seek(n, true)
+	return
+
+}
+
+// FlipBit flips the bit located at the specified offset without modifying the internal offset value
+func (b *Bitfield) FlipBit(off int64) {
+
+	b.flipbit(off)
+	return
+
+}
+
+// FlipBitNext flips the next bit from the current offset and moves the offset foward a bit
+func (b *Bitfield) FlipBitNext() {
+
+	b.flipbit(b.off)
+	b.seek(1, true)
+	return
+
+}
+
+// Clear sets all of the bitfield values to 0
+func (b *Bitfield) Clear() {
+
+	b.clear()
+	return
+
+}
+
+// SetAll sets all of the bitfield values to 1
+func (b *Bitfield) SetAll() {
+
+	b.setall()
+	return
+
+}
+
+// FlipAll flips all of the bitfield's bits
+func (b *Bitfield) FlipAll() {
+
+	b.flipall()
 	return
 
 }
