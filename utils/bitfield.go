@@ -43,6 +43,8 @@ func atob(b bool) byte {
 
 }
 
+/* bitfield type */
+
 // Bitfield implements a concurrent-safe bitfield implementation in go
 type Bitfield struct {
 	btf []byte
@@ -90,8 +92,8 @@ func (b *Bitfield) readbit(off int64) byte {
 	b.Lock()
 	defer b.Unlock()
 
-	i, o := (off / 8), (off % 8)
-	return atob((b.btf[i] & (1 << uint(o))) != 0)
+	i, o := (off / 8), uint(7-(off % 8))
+	return atob((b.btf[i] & (1 << o)) != 0)
 
 }
 
@@ -123,20 +125,40 @@ func (b *Bitfield) setbit(off, data int64) {
 
 	}
 
-	if data != 1 || data != 0 {
+	if data != 1 && data != 0 {
 
 		panic(errors.BitfieldInvalidBit)
 
 	}
 
-	i, o := (off / 8), (off % 8)
+	b.Lock()
+	defer b.Unlock()
+	
+	i, o := (off / 8), uint(7 - (off % 8))
 	switch data {
 
 	case 0:
-		b.btf[i] &= ^(1 << uint(o))
+		b.btf[i] &= ^(1 << o)
 
 	case 1:
-		b.btf[i] |= (1 << uint(o))
+		b.btf[i] |= (1 << o)
+
+	}
+
+}
+
+// setbits sets n bits in the bitfield to the specified value at the specified offset
+func (b *Bitfield) setbits(off, data, n int64) {
+
+	if off + n > (b.cap - 1) {
+
+		panic(errors.BitfieldOverwriteError)
+
+	}
+
+	for i := int64(0); i < n; i++ {
+
+		b.setbit(off+i, (data >> uint64(n - i - 1)) & 1)
 
 	}
 
@@ -285,6 +307,40 @@ func (b *Bitfield) ReadBitNext() (out byte) {
 func (b *Bitfield) ReadBitsNext(n int64) (out int64) {
 
 	out = b.readbits(b.off, n)
+	b.seek(n, true)
+	return
+
+}
+
+// SetBit sets the bit located at the specified offset without modifying the internal offset value
+func (b *Bitfield) SetBit(off, data int64) {
+
+	b.setbit(off, data)
+	return
+
+}
+
+// SetBits sets the next n bits from the specified offset without modifying the internal offset value
+func (b *Bitfield) SetBits(off, data, n int64) {
+
+	b.setbits(off, data, n)
+	return
+
+}
+
+// SetBitNext sets the next bit from the current offset and moves the offset foward a bit
+func (b *Bitfield) SetBitNext(data int64) {
+
+	b.setbit(b.off, data)
+	b.seek(1, true)
+	return
+
+}
+
+// SetBitsNext sets the next n bits from the current offset and moves the offset foward the amount of bits set
+func (b *Bitfield) SetBitsNext(data, n int64) {
+
+	b.setbits(b.off, data, n)
 	b.seek(n, true)
 	return
 
