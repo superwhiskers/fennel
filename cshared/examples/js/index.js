@@ -1,4 +1,4 @@
-// libninty.js - test code for libninty.so
+// fennel.js - test code for fennel.so
 let ffi = require('ffi')
 let ref = require('ref')
 let Struct = require('ref-struct')
@@ -18,9 +18,9 @@ let clientInfoStruct = Struct({
     'PlatformID': 'string'
 })
 
-let libninty = ffi.Library('./libninty.so', {
-    'libninty_newClient': [ clientType, [ 'string', 'string', 'string', clientInfoStruct ]],
-    'libninty_doesUserExist': [ 'int', [ clientType, 'string' ]]
+let fennel = ffi.Library('../fennel.so', {
+    'fennel_newClient': [ clientType, [ 'string', 'string', 'string', clientInfoStruct ]],
+    'fennel_doesUserExist': [ 'int', [ clientType, 'string' ]]
 })
 
 let clientInfo = new clientInfoStruct()
@@ -36,9 +36,9 @@ clientInfo.DeviceID = "1"
 clientInfo.DeviceType = ""
 clientInfo.PlatformID = "1"
 
-let client = libninty.libninty_newClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
+let client = fennel.fennel_newClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
 
-if (libninty.libninty_doesUserExist(client, process.argv[2]) === 0) {
+if (fennel.fennel_doesUserExist(client, process.argv[2]) === 0) {
 
     console.log("no, that user does not exist")
 

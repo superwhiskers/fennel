@@ -1,2 +1,3 @@
+#!/bin/bash
 # compiles libninty.c
-clang libninty.c ../libninty.so -Wl,-rpath,. -o libninty-c
+clang fennel.c ../fennel.so -Wl,-rpath,. -o fennel-c

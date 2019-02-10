@@ -1,7 +1,7 @@
-# libninty.py - test code for libninty.so
+# fennel.py - test code for fennel.so
 import ctypes, sys
 
-# ClientInformation is an implementation of libninty's ClientInformation struct in python
+# ClientInformation is an implementation of fennel's ClientInformation struct in python
 class ClientInformation(ctypes.Structure):
     _fields_ = [
         ("ClientID", ctypes.c_char_p),
@@ -44,13 +44,13 @@ class ClientInformation(ctypes.Structure):
         self.PlatformID = platform_id
 
 
-# load libninty
-libninty = ctypes.CDLL("./libninty.so")
+# load fennel
+fennel = ctypes.CDLL("../fennel.so")
 
 # create a clientinformation struct
 clientInfo = ClientInformation()
 
-newClient = libninty.libninty_newClient
+newClient = fennel.fennel_newClient
 newClient.argtypes = [
     ctypes.c_char_p,
     ctypes.c_char_p,
@@ -59,7 +59,7 @@ newClient.argtypes = [
 ]
 newClient.restype = ctypes.c_void_p
 
-doesUserExist = libninty.libninty_doesUserExist
+doesUserExist = fennel.fennel_doesUserExist
 doesUserExist.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
 doesUserExist.restype = ctypes.c_int
 

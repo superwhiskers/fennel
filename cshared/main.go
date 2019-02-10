@@ -18,15 +18,18 @@ struct ClientInformation {
 typedef void* Client;
 */
 import "C"
+
 import (
 	"unsafe"
 	"strings"
 
-	libninty "github.com/superwhiskers/fennel"
+	"github.com/superwhiskers/fennel"
 )
 
-//export libninty_newClient
-func libninty_newClient(accountServer, certificatePath, keyPath *C.char, clientInfo C.struct_ClientInformation) C.Clielient, err := libninty.NewClient(gostring(accountServer), gostring(certificatePath), gostring(keyPath), libninty.ClientInformation{
+//export fennel_newClient
+func fennel_newClient(accountServer, certificatePath, keyPath *C.char, clientInfo C.struct_ClientInformation) C.Client {
+
+	client, err := fennel.NewAccountServerClient(gostring(accountServer), gostring(certificatePath), gostring(keyPath), fennel.ClientInformation{
 		ClientID: gostring(clientInfo.ClientID),
 		ClientSecret: gostring(clientInfo.ClientSecret),
 		DeviceCert: gostring(clientInfo.DeviceCert),
@@ -45,12 +48,12 @@ func libninty_newClient(accountServer, certificatePath, keyPath *C.char, clientI
 
 	}
 
-	return C.Client(unsafe.Pointer(Client))
+	return C.Client(unsafe.Pointer(client))
 
 }
 
-//export libninty_doesUserExist
-func libninty_doesUserExist(clientPtr C.Client, nnid *C.char) C.int {
+//export fennel_doesUserExist
+func fennel_doesUserExist(clientPtr C.Client, nnid *C.char) C.int {
 
 	client := convertPointerToClient(clientPtr)
 
@@ -77,9 +80,9 @@ func libninty_doesUserExist(clientPtr C.Client, nnid *C.char) C.int {
 
 }
 
-func convertPointerToClient(ptr C.Client) *libninty.Client {
+func convertPointerToClient(ptr C.Client) *fennel.AccountServerClient {
 
-	return (*libninty.Client)(unsafe.Pointer(ptr))
+	return (*fennel.AccountServerClient)(unsafe.Pointer(ptr))
 
 }
 
