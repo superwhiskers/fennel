@@ -87,7 +87,7 @@ func TestDoesUserExist(t *testing.T) {
 
 	}
 
-	output, exml, err := client.DoesUserExist("abcdefg")
+	output, exml, err := client.DoesUserExist("scott0852")
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
@@ -153,7 +153,7 @@ func TestGetPIDs(t *testing.T) {
 
 	}
 
-	output, exml, err := client.GetPIDs([]string{"abcdefg"})
+	output, exml, err := client.GetPIDs([]string{"scott0852"})
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
@@ -166,12 +166,12 @@ func TestGetPIDs(t *testing.T) {
 
 	}
 
-	if output[0] != 1799704789 {
+	if output[0] != 1794841894 {
 
 		t.Errorf("invalid output")
 
 	}
-	
+
 }
 
 func TestGetNNIDs(t *testing.T) {
@@ -183,7 +183,7 @@ func TestGetNNIDs(t *testing.T) {
 
 	}
 
-	output, exml, err := client.GetNNIDs([]int64{0x6b4550d5})
+	output, exml, err := client.GetNNIDs([]int64{1794841894})
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
@@ -196,7 +196,7 @@ func TestGetNNIDs(t *testing.T) {
 
 	}
 
-	if output[0] != "ABCDEFG" {
+	if output[0] != "SCOTT0852" {
 
 		t.Errorf("invalid output")
 
@@ -213,7 +213,7 @@ func TestGetMiis(t *testing.T) {
 
 	}
 
-	_, exml, err := client.GetMiis([]int64{0x6b4550d5})
+	_, exml, err := client.GetMiis([]int64{1794841894})
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
