@@ -25,29 +25,29 @@ import "github.com/superwhiskers/fennel/utils"
 // Mii contains all of the data that a mii can have
 type Mii struct {
 	// unknown fields
-	Unknown1  [4]byte
-	Unknown2  [4]byte
-	Unknown3  [4]byte
+	Unknown1  int64
+	Unknown2  int64
+	Unknown3  int64
 	Unknown4  byte
-	Unknown5  [2]byte
+	Unknown5  []byte
 	Unknown6  byte
 	Unknown7  byte
 	Unknown8  uint8
 	Unknown9  byte
-	Unknown10 [2]byte
+	Unknown10 []byte
 
 	// attributes
-	BirthPlatform [4]byte
-	FontRegion    [4]byte
-	RegionMove    [2]byte
+	BirthPlatform int64
+	FontRegion    int64
+	RegionMove    int64
 	Copyable      bool
 	MiiVersion    uint8
-	AuthorID      [8]uint8
-	MiiID         [10]uint8
+	AuthorID      []uint8
+	MiiID         []uint8
 	LocalOnly     bool
-	Color         [4]byte
-	BirthDay      [5]byte
-	BirthMonth    [4]byte
+	Color         int64
+	BirthDay      []byte
+	BirthMonth    []byte
 	Gender        byte
 	MiiName       string
 	Size          uint8
@@ -56,140 +56,70 @@ type Mii struct {
 	Checksum      uint16
 
 	// face
-	BlushType [4]byte
-	FaceStyle [4]byte
-	FaceColor [3]byte
-	FaceType  [4]byte
+	BlushType []byte
+	FaceStyle []byte
+	FaceColor []byte
+	FaceType  []byte
 
 	// hair
 	HairMirrored bool
-	HairColor    [3]byte
+	HairColor    []byte
 	HairType     uint8
 
 	// eyes
-	EyeThickness [3]byte
-	EyeScale     [4]byte
-	EyeColor     [3]byte
-	EyeType      [6]byte
-	EyeHeight    [7]byte
-	EyeDistance  [4]byte
-	EyeRotation  [5]byte
+	EyeThickness []byte
+	EyeScale     []byte
+	EyeColor     []byte
+	EyeType      []byte
+	EyeHeight    []byte
+	EyeDistance  []byte
+	EyeRotation  []byte
 
 	// eyebrow
-	EyebrowThickness [4]byte
-	EyebrowScale     [4]byte
-	EyebrowColor     [3]byte
-	EyebrowType      [5]byte
-	EyebrowHeight    [7]byte
-	EyebrowDistance  [4]byte
-	EyebrowRotation  [5]byte
+	EyebrowThickness []byte
+	EyebrowScale     []byte
+	EyebrowColor     []byte
+	EyebrowType      []byte
+	EyebrowHeight    []byte
+	EyebrowDistance  []byte
+	EyebrowRotation  []byte
 
 	// nose
-	NoseHeight [7]byte
-	NoseScale  [4]byte
-	NoseType   [5]byte
+	NoseHeight []byte
+	NoseScale  []byte
+	NoseType   []byte
 
 	// mouth
-	MouthThickness [3]byte
-	MouthScale     [4]byte
-	MouthColor     [3]byte
-	MouthType      [6]byte
-	MouthHeight    [5]byte
+	MouthThickness []byte
+	MouthScale     []byte
+	MouthColor     []byte
+	MouthType      []byte
+	MouthHeight    []byte
 
 	// mustache
-	MustacheType   [3]byte
-	MustacheHeight [6]byte
-	MustacheScale  [4]byte
+	MustacheType   []byte
+	MustacheHeight []byte
+	MustacheScale  []byte
 
 	// beard
-	BeardColor [3]byte
-	BeardType  [3]byte
+	BeardColor []byte
+	BeardType  []byte
 
 	// glasses
-	GlassesHeight [5]byte
-	GlassesScale  [4]byte
-	GlassesColor  [3]byte
-	GlassesType   [4]byte
+	GlassesHeight []byte
+	GlassesScale  []byte
+	GlassesColor  []byte
+	GlassesType   []byte
 
 	// mole
-	MoleY       [5]byte
-	MoleX       [5]byte
-	MoleScale   [4]byte
+	MoleY       []byte
+	MoleX       []byte
+	MoleScale   []byte
 	MoleEnabled bool
 }
 
 // NilMii is a Mii with no data
-var NilMii = Mii{
-	Unknown1:         [4]byte{0, 0, 0, 0},
-	Unknown2:         [4]byte{0, 0, 0, 0},
-	Unknown3:         [4]byte{0, 0, 0, 0},
-	Unknown4:         0x00,
-	Unknown5:         [2]byte{0, 0},
-	Unknown6:         0x00,
-	Unknown7:         0x00,
-	Unknown8:         uint8(0),
-	Unknown9:         0x00,
-	Unknown10:        [2]byte{0, 0},
-	BirthPlatform:    [4]byte{0, 0, 0, 0},
-	FontRegion:       [4]byte{0, 0, 0, 0},
-	RegionMove:       [2]byte{0, 0},
-	Copyable:         false,
-	MiiVersion:       uint8(0),
-	AuthorID:         [8]uint8{uint8(0), uint8(0), uint8(0), uint8(0), uint8(0), uint8(0), uint8(0), uint8(0)},
-	MiiID:            [10]uint8{uint8(0), uint8(0), uint8(0), uint8(0), uint8(0), uint8(0), uint8(0), uint8(0), uint8(0), uint8(0)},
-	LocalOnly:        false,
-	Color:            [4]byte{0, 0, 0, 0},
-	BirthDay:         [5]byte{0, 0, 0, 0, 0},
-	BirthMonth:       [4]byte{0, 0, 0, 0},
-	Gender:           0x00,
-	MiiName:          "",
-	Size:             uint8(0),
-	Fatness:          uint8(0),
-	AuthorName:       "",
-	Checksum:         uint16(0),
-	BlushType:        [4]byte{0, 0, 0, 0},
-	FaceStyle:        [4]byte{0, 0, 0, 0},
-	FaceColor:        [3]byte{0, 0, 0},
-	FaceType:         [4]byte{0, 0, 0, 0},
-	HairMirrored:     false,
-	HairColor:        [3]byte{0, 0, 0},
-	HairType:         uint8(0),
-	EyeThickness:     [3]byte{0, 0, 0},
-	EyeScale:         [4]byte{0, 0, 0, 0},
-	EyeColor:         [3]byte{0, 0, 0},
-	EyeType:          [6]byte{0, 0, 0, 0, 0, 0},
-	EyeHeight:        [7]byte{0, 0, 0, 0, 0, 0, 0},
-	EyeDistance:      [4]byte{0, 0, 0, 0},
-	EyeRotation:      [5]byte{0, 0, 0, 0, 0},
-	EyebrowThickness: [4]byte{0, 0, 0, 0},
-	EyebrowScale:     [4]byte{0, 0, 0, 0},
-	EyebrowColor:     [3]byte{0, 0, 0},
-	EyebrowType:      [5]byte{0, 0, 0, 0, 0},
-	EyebrowHeight:    [7]byte{0, 0, 0, 0, 0, 0, 0},
-	EyebrowDistance:  [4]byte{0, 0, 0, 0},
-	EyebrowRotation:  [5]byte{0, 0, 0, 0, 0},
-	NoseHeight:       [7]byte{0, 0, 0, 0, 0, 0, 0},
-	NoseScale:        [4]byte{0, 0, 0, 0},
-	NoseType:         [5]byte{0, 0, 0, 0, 0},
-	MouthThickness:   [3]byte{0, 0, 0},
-	MouthScale:       [4]byte{0, 0, 0, 0},
-	MouthColor:       [3]byte{0, 0, 0},
-	MouthType:        [6]byte{0, 0, 0, 0, 0, 0},
-	MouthHeight:      [5]byte{0, 0, 0, 0, 0},
-	MustacheType:     [3]byte{0, 0, 0},
-	MustacheHeight:   [6]byte{0, 0, 0, 0, 0, 0},
-	MustacheScale:    [4]byte{0, 0, 0, 0},
-	BeardColor:       [3]byte{0, 0, 0},
-	BeardType:        [3]byte{0, 0, 0},
-	GlassesHeight:    [5]byte{0, 0, 0, 0, 0},
-	GlassesScale:     [4]byte{0, 0, 0, 0},
-	GlassesColor:     [3]byte{0, 0, 0},
-	GlassesType:      [4]byte{0, 0, 0, 0},
-	MoleY:            [5]byte{0, 0, 0, 0, 0},
-	MoleX:            [5]byte{0, 0, 0, 0, 0},
-	MoleScale:        [4]byte{0, 0, 0, 0},
-	MoleEnabled:      false,
-}
+var NilMii = Mii{}
 
 // swaps the endianness of a mii binary format to little-endian
 func swapMiiEndiannessToLittle(data []byte) []byte {
@@ -217,29 +147,43 @@ func swapMiiEndiannessToLittle(data []byte) []byte {
 // ParseMii takes a mii as a byte array and parses it to a Mii
 func ParseMii(miiByte []byte) Mii {
 
-	buf := utils.NewByteBuffer(swapMiiEndiannessToLittle(miiByte[:0x61]))
+	buf := utils.NewByteBuffer(swapMiiEndiannessToLittle(miiByte[0:0x61]))
+	btf := utils.NewBitfield(swapMiiEndiannessToLittle(miiByte[0:0x61])...)
 	mii := Mii{}
 
-	// TODO: implement this after bytefields get properly implemented in the utils package
-	/*
-		mii.BirthPlatform = buf.ReadBytesNext(4)
-		mii.Unknown1 = buf.ReadBytesNext(4)
-		mii.Unknown2 = buf.ReadBytesNext(4)
-		mii.Unknown3 = buf.ReadBytesNext(4)
-		mii.FontRegion = buf.ReadBytesNext(4)
-		mii.RegionMove = buf.ReadBytesNext(2)
-		mii.Unknown4 = buf.ReadBytesNext(1)[0]
-		if buf.ReadBytesNext(1)[0] == 0x00 {
+	mii.BirthPlatform = btf.ReadBitsNext(4) // 0x00
+	mii.Unknown1      = btf.ReadBitsNext(4) // 0x00.4
+	mii.Unknown2      = btf.ReadBitsNext(4) // 0x01
+	mii.Unknown3      = btf.ReadBitsNext(4) // 0x01.4
+	mii.FontRegion    = btf.ReadBitsNext(4) // 0x02
+	mii.RegionMove    = btf.ReadBitsNext(2) // 0x02.4
+	mii.Unknown4      = btf.ReadBitNext()   // 0x02.6
+	if btf.ReadBitNext() == 0x00 {          // 0x02.7
 
-			mii.Copyable = false
+		mii.Copyable = false
 
-		} else {
+	} else {
 
-			mii.Copyable = true
+		mii.Copyable = true
 
-		}
-	*/
+	}
 
-	return NilMii
+	// seek the byte buffer to offset 0x03 to align it with the bitfield's offset
+	buf.Seek(0x03, false)
+
+	mii.MiiVersion = buf.ReadBytesNext(1)[0] // 0x03
+	mii.AuthorID   = buf.ReadBytesNext(8)    // 0x04
+	mii.MiiID      = buf.ReadBytesNext(10)   // 0x0C
+	mii.Unknown5   = buf.ReadBytesNext(2)    // 0x16
+
+	// seek the bitfield to offset 0x16*8 to align it with the byte buffer's offset
+	// (the bitfield takes offsets in terms of bits)
+	btf.Seek(0x16*8, false)
+
+	mii.Unknown6 = btf.ReadBitNext()   // 0x16
+	mii.Unknown7 = btf.ReadBitNext()   // 0x16.1
+	mii.Color    = btf.ReadBitsNext(4) // 0x16.2
+
+	return mii
 
 }

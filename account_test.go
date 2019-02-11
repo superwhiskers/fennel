@@ -87,10 +87,16 @@ func TestDoesUserExist(t *testing.T) {
 
 	}
 
-	output, _, err := client.DoesUserExist("whiskers")
+	output, exml, err := client.DoesUserExist("abcdefg")
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	if len(exml.Errors) != 0 {
+
+		t.Errorf("expected no error to occur, instead got %v\n", exml.Errors[0])
 
 	}
 
@@ -111,31 +117,112 @@ func TestGetEULA(t *testing.T) {
 
 	}
 
-	output, _, err := client.GetEULA("US", "@latest")
+	output, exml, err := client.GetEULA("US", "@latest")
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
 
 	}
 
-	verified := false
+	if len(exml.Errors) != 0 {
+
+		t.Errorf("expected no error to occur, instead got %v\n", exml.Errors[0])
+
+	}
+
 	for _, agreement := range output.Agreements {
 
-		if agreement.Language == "en" {
+		if agreement.Language == "en" && agreement.Title.Data == "Nintendo Network Services Agreement" {
 
-			if agreement.Title.Data == "Nintendo Network Services Agreement" {
-
-				verified = true
-
-			}
+			return
 
 		}
 
 	}
 
-	if verified == false {
+	t.Errorf("invalid output")
+
+}
+
+func TestGetPIDs(t *testing.T) {
+
+	client, err := NewAccountServerClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
+	if err != nil {
+
+		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	output, exml, err := client.GetPIDs([]string{"abcdefg"})
+	if err != nil {
+
+		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	if len(exml.Errors) != 0 {
+
+		t.Errorf("expected no error to occur, instead got %v\n", exml.Errors[0])
+
+	}
+
+	if output[0] != 1799704789 {
 
 		t.Errorf("invalid output")
+
+	}
+	
+}
+
+func TestGetNNIDs(t *testing.T) {
+
+	client, err := NewAccountServerClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
+	if err != nil {
+
+		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	output, exml, err := client.GetNNIDs([]int64{0x6b4550d5})
+	if err != nil {
+
+		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	if len(exml.Errors) != 0 {
+
+		t.Errorf("expected no error to occur, instead got %v\n", exml.Errors[0])
+
+	}
+
+	if output[0] != "ABCDEFG" {
+
+		t.Errorf("invalid output")
+
+	}
+
+}
+
+func TestGetMiis(t *testing.T) {
+
+	client, err := NewAccountServerClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
+	if err != nil {
+
+		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	_, exml, err := client.GetMiis([]int64{0x6b4550d5})
+	if err != nil {
+
+		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	if len(exml.Errors) != 0 {
+
+		t.Errorf("expected no error to occur, instead got %v\n", exml.Errors[0])
 
 	}
 

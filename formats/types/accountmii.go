@@ -18,32 +18,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 */
 
-package utils
+package types
 
-import "strconv"
-
-// ApplyByteSliceAtOffset applies a byte slice to another byte slice at the specified offset, overwriting any existing indexes already in the slice
-func ApplyByteSliceAtOffset(src, dest []byte, offset int) []byte {
-
-	for i, byt := range src {
-
-		dest[offset+i] = byt
-
-	}
-	return dest
-
-}
-
-// ConvertInt64SliceToStringSlice converts a slice of int64s to a slice of strings
-func ConvertInt64SliceToStringSlice(il []int64) (sl []string) {
-
-	sl = []string{}
-	for _, i := range il {
-
-		sl = append(sl, strconv.Itoa(int(i)))
-
-	}
-
-	return
-
+// AccountMii contains a regular Mii along with extra data that comes from the account server
+type AccountMii struct {
+	Mii Mii
+	ID int64
+	Images map[string]string
+	Name string
+	PID int64
+	Primary bool
+	NNID string
 }

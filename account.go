@@ -23,8 +23,12 @@ package fennel
 import (
 	"crypto/tls"
 	"strings"
+	"strconv"
+	"fmt"
 
 	"github.com/superwhiskers/fennel/errors"
+	"github.com/superwhiskers/fennel/formats/types"
+	"github.com/superwhiskers/fennel/utils"
 	"github.com/superwhiskers/fennel/formats/xmls"
 	"github.com/valyala/fasthttp"
 )
@@ -34,6 +38,7 @@ type AccountServerClient struct {
 	APIEndpoint       string
 	HTTPClient        *fasthttp.Client
 	ClientInformation ClientInformation
+	ReqHeader         fasthttp.RequestHeader
 }
 
 // NewAccountServerClient is a constructor function for creating a client for the nintendo network account servers
@@ -79,7 +84,6 @@ func (c *AccountServerClient) Do(request *fasthttp.Request, response *fasthttp.R
 	request.Header.Set("X-Nintendo-Country", c.ClientInformation.Country)
 	request.Header.Set("X-Nintendo-Environment", c.ClientInformation.Environment)
 	request.Header.Set("X-Nintendo-Device-Cert", c.ClientInformation.DeviceCert)
-
 	return c.HTTPClient.Do(request, response)
 
 }
@@ -175,5 +179,152 @@ func (c *AccountServerClient) GetEULA(countryCode, version string) (xmls.Agreeme
 	}
 
 	return xmls.NilAgreementXML, errorXML, nil
+
+}
+
+// GetMiis retrieves the miis for the provided pids
+func (c *AccountServerClient) GetMiis(pids []int64) ([]types.AccountMii, xmls.ErrorXML, error) {
+
+	request := fasthttp.AcquireRequest()
+	response := fasthttp.AcquireResponse()
+	requestHeader := fasthttp.RequestHeader{}
+
+	defer fasthttp.ReleaseRequest(request)
+	defer fasthttp.ReleaseResponse(response)
+
+	requestHeader.SetMethod("GET")
+	request.Header = requestHeader
+
+	spids := utils.ConvertInt64SliceToStringSlice(pids)
+	request.SetRequestURI(strings.Join([]string{c.APIEndpoint, "/miis?pids=", strings.Join(spids, ",")}, ""))
+
+	err := c.Do(request, response)
+	if err != nil {
+
+		return []types.AccountMii{}, xmls.NilErrorXML, err
+
+	}
+
+	if response.StatusCode() == 200 {
+
+		fmt.Println(string(response.Body()))
+
+	}
+
+	return []types.AccountMii{}, xmls.NilErrorXML, nil
+
+}
+
+// GetPIDs retrieves the pids for the provided nnids
+func (c *AccountServerClient) GetPIDs(nnids []string) ([]int64, xmls.ErrorXML, error) {
+
+	request := fasthttp.AcquireRequest()
+	response := fasthttp.AcquireResponse()
+	requestHeader := fasthttp.RequestHeader{}
+
+	defer fasthttp.ReleaseRequest(request)
+	defer fasthttp.ReleaseResponse(response)
+
+	requestHeader.SetMethod("GET")
+	request.Header = requestHeader
+	request.SetRequestURI(strings.Join([]string{c.APIEndpoint, "/admin/mapped_ids?input_type=user_id&output_type=pid&input=", strings.Join(nnids, ",")}, ""))
+
+	err := c.Do(request, response)
+	if err != nil {
+
+		return []int64{}, xmls.NilErrorXML, err
+
+	}
+
+	if response.StatusCode() == 200 {
+
+		mixml, err := xmls.ParseMappedIDsXML(response.Body())
+		if err != nil {
+
+			return []int64{}, xmls.NilErrorXML, err
+
+		}
+
+		mis := []int64{}
+		var id int64
+		for _, mi := range mixml.MappedIDs {
+
+			id, err = strconv.ParseInt(mi.OutID, 10, 64)
+			if err != nil {
+
+				return []int64{}, xmls.NilErrorXML, err
+
+			}
+
+			mis = append(mis, id)
+
+		}
+
+		return mis, xmls.NilErrorXML, nil
+
+	}
+
+	errorXML, err := xmls.ParseErrorXML(response.Body())
+	if err != nil {
+
+		return []int64{}, xmls.NilErrorXML, err
+
+	}
+
+	return []int64{}, errorXML, nil
+
+}
+
+// GetNNIDs retrieves the nnids for the provided pids
+func (c *AccountServerClient) GetNNIDs(pids []int64) ([]string, xmls.ErrorXML, error) {
+
+	request := fasthttp.AcquireRequest()
+	response := fasthttp.AcquireResponse()
+	requestHeader := fasthttp.RequestHeader{}
+
+	defer fasthttp.ReleaseRequest(request)
+	defer fasthttp.ReleaseResponse(response)
+
+	requestHeader.SetMethod("GET")
+	request.Header = requestHeader
+
+	spids := utils.ConvertInt64SliceToStringSlice(pids)
+	request.SetRequestURI(strings.Join([]string{c.APIEndpoint, "/admin/mapped_ids?input_type=pid&output_type=user_id&input=", strings.Join(spids, ",")}, ""))
+
+	err := c.Do(request, response)
+	if err != nil {
+
+		return []string{}, xmls.NilErrorXML, err
+
+	}
+
+	if response.StatusCode() == 200 {
+
+		mixml, err := xmls.ParseMappedIDsXML(response.Body())
+		if err != nil {
+
+			return []string{}, xmls.NilErrorXML, err
+
+		}
+
+		mis := []string{}
+		for _, mi := range mixml.MappedIDs {
+
+			mis = append(mis, mi.OutID)
+
+		}
+
+		return mis, xmls.NilErrorXML, nil
+
+	}
+
+	errorXML, err := xmls.ParseErrorXML(response.Body())
+	if err != nil {
+
+		return []string{}, xmls.NilErrorXML, err
+
+	}
+
+	return []string{}, errorXML, nil
 
 }
