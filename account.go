@@ -22,14 +22,12 @@ package fennel
 
 import (
 	"crypto/tls"
-	"strings"
 	"strconv"
-	"fmt"
+	"strings"
 
 	"github.com/superwhiskers/fennel/errors"
-	"github.com/superwhiskers/fennel/formats/types"
-	"github.com/superwhiskers/fennel/utils"
 	"github.com/superwhiskers/fennel/formats/xmls"
+	"github.com/superwhiskers/fennel/utils"
 	"github.com/valyala/fasthttp"
 )
 
@@ -183,7 +181,7 @@ func (c *AccountServerClient) GetEULA(countryCode, version string) (xmls.Agreeme
 }
 
 // GetMiis retrieves the miis for the provided pids
-func (c *AccountServerClient) GetMiis(pids []int64) ([]types.AccountMii, xmls.ErrorXML, error) {
+func (c *AccountServerClient) GetMiis(pids []int64) (xmls.AccountMiiXML, xmls.ErrorXML, error) {
 
 	request := fasthttp.AcquireRequest()
 	response := fasthttp.AcquireResponse()
@@ -201,17 +199,31 @@ func (c *AccountServerClient) GetMiis(pids []int64) ([]types.AccountMii, xmls.Er
 	err := c.Do(request, response)
 	if err != nil {
 
-		return []types.AccountMii{}, xmls.NilErrorXML, err
+		return xmls.AccountMiiXML{}, xmls.NilErrorXML, err
 
 	}
 
 	if response.StatusCode() == 200 {
 
-		fmt.Println(string(response.Body()))
+		amxml, err := xmls.ParseAccountMiiXML(response.Body())
+		if err != nil {
+
+			return xmls.AccountMiiXML{}, xmls.NilErrorXML, err
+
+		}
+
+		return amxml, xmls.NilErrorXML, nil
 
 	}
 
-	return []types.AccountMii{}, xmls.NilErrorXML, nil
+	errorXML, err := xmls.ParseErrorXML(response.Body())
+	if err != nil {
+
+		return xmls.AccountMiiXML{}, xmls.NilErrorXML, err
+
+	}
+
+	return xmls.AccountMiiXML{}, errorXML, nil
 
 }
 

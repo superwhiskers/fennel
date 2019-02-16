@@ -23,9 +23,7 @@ package xmls
 import "encoding/xml"
 
 // NillMappedIDsXML represents a MappedIDsXML with no value
-var NilMappedIDsXML = MappedIDsXML{
-	MappedIDs: []MappedIDsXMLMappedID{},
-}
+var NilMappedIDsXML = MappedIDsXML{}
 
 // MappedIDsXML represents a nintendo network mappedids xml sheet
 type MappedIDsXML struct {
@@ -36,8 +34,7 @@ type MappedIDsXML struct {
 // FormatXML formats the MappedIDsXML as a byte array
 func (m MappedIDsXML) FormatXML() ([]byte, error) {
 
-	mappedidsxml, err := xml.Marshal(m)
-	return mappedidsxml, err
+	return xml.Marshal(m)
 
 }
 

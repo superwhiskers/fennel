@@ -26,9 +26,7 @@ import (
 )
 
 // NilErrorXML represents an ErrorXML with no value
-var NilErrorXML = ErrorXML{
-	Errors: []ErrorXMLError{},
-}
+var NilErrorXML = ErrorXML{}
 
 // ErrorXML represents a nintendo network error xml sheet
 type ErrorXML struct {
@@ -39,8 +37,7 @@ type ErrorXML struct {
 // FormatXML formats an ErrorXML struct as a byte array
 func (e ErrorXML) FormatXML() ([]byte, error) {
 
-	errorxml, err := xml.Marshal(e)
-	return errorxml, err
+	return xml.Marshal(e)
 
 }
 

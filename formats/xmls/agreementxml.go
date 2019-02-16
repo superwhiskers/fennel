@@ -26,9 +26,7 @@ import (
 )
 
 // NilAgreementXML represents an AgreementXML with no value
-var NilAgreementXML = AgreementXML{
-	Agreements: []AgreementXMLAgreement{},
-}
+var NilAgreementXML = AgreementXML{}
 
 // AgreementXML represents a nintendo network agreement xml sheet
 type AgreementXML struct {
@@ -39,8 +37,7 @@ type AgreementXML struct {
 // FormatXML formats the AgreementXML as a byte array
 func (a AgreementXML) FormatXML() ([]byte, error) {
 
-	agreementxml, err := xml.Marshal(a)
-	return agreementxml, err
+	return xml.Marshal(a)
 
 }
 

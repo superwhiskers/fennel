@@ -213,7 +213,7 @@ func TestGetMiis(t *testing.T) {
 
 	}
 
-	_, exml, err := client.GetMiis([]int64{1794841894})
+	miis, exml, err := client.GetMiis([]int64{1794841894})
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
@@ -225,5 +225,7 @@ func TestGetMiis(t *testing.T) {
 		t.Errorf("expected no error to occur, instead got %v\n", exml.Errors[0])
 
 	}
+
+	t.Logf("%#v\n", miis.Miis[0].Mii)
 
 }

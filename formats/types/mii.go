@@ -20,14 +20,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package types
 
-import "github.com/superwhiskers/fennel/utils"
+import (
+	"unicode/utf8"
+	
+	"github.com/superwhiskers/fennel/utils"
+)
 
 // Mii contains all of the data that a mii can have
 type Mii struct {
 	// unknown fields
-	Unknown1  int64
-	Unknown2  int64
-	Unknown3  int64
+	Unknown1  uint64
+	Unknown2  uint64
+	Unknown3  uint64
 	Unknown4  byte
 	Unknown5  []byte
 	Unknown6  byte
@@ -37,17 +41,17 @@ type Mii struct {
 	Unknown10 []byte
 
 	// attributes
-	BirthPlatform int64
-	FontRegion    int64
-	RegionMove    int64
+	BirthPlatform uint64
+	FontRegion    uint64
+	RegionMove    uint64
 	Copyable      bool
 	MiiVersion    uint8
 	AuthorID      []uint8
 	MiiID         []uint8
 	LocalOnly     bool
-	Color         int64
-	BirthDay      []byte
-	BirthMonth    []byte
+	Color         uint64
+	BirthDay      uint64
+	BirthMonth    uint64
 	Gender        byte
 	MiiName       string
 	Size          uint8
@@ -147,17 +151,17 @@ func swapMiiEndiannessToLittle(data []byte) []byte {
 // ParseMii takes a mii as a byte array and parses it to a Mii
 func ParseMii(miiByte []byte) Mii {
 
-	buf := utils.NewByteBuffer(swapMiiEndiannessToLittle(miiByte[0:0x61]))
-	btf := utils.NewBitfield(swapMiiEndiannessToLittle(miiByte[0:0x61])...)
+	buf := utils.NewByteBuffer(swapMiiEndiannessToLittle(miiByte))
+	btf := utils.NewBitfield(miiByte...)
 	mii := Mii{}
 
 	mii.BirthPlatform = btf.ReadBitsNext(4) // 0x00
-	mii.Unknown1      = btf.ReadBitsNext(4) // 0x00.4
-	mii.Unknown2      = btf.ReadBitsNext(4) // 0x01
-	mii.Unknown3      = btf.ReadBitsNext(4) // 0x01.4
-	mii.FontRegion    = btf.ReadBitsNext(4) // 0x02
-	mii.RegionMove    = btf.ReadBitsNext(2) // 0x02.4
-	mii.Unknown4      = btf.ReadBitNext()   // 0x02.6
+	mii.Unknown1 = btf.ReadBitsNext(4)      // 0x00.4
+	mii.Unknown2 = btf.ReadBitsNext(4)      // 0x01
+	mii.Unknown3 = btf.ReadBitsNext(4)      // 0x01.4
+	mii.FontRegion = btf.ReadBitsNext(4)    // 0x02
+	mii.RegionMove = btf.ReadBitsNext(2)    // 0x02.4
+	mii.Unknown4 = btf.ReadBitNext()        // 0x02.6
 	if btf.ReadBitNext() == 0x00 {          // 0x02.7
 
 		mii.Copyable = false
@@ -172,17 +176,35 @@ func ParseMii(miiByte []byte) Mii {
 	buf.Seek(0x03, false)
 
 	mii.MiiVersion = buf.ReadBytesNext(1)[0] // 0x03
-	mii.AuthorID   = buf.ReadBytesNext(8)    // 0x04
-	mii.MiiID      = buf.ReadBytesNext(10)   // 0x0C
-	mii.Unknown5   = buf.ReadBytesNext(2)    // 0x16
+	mii.AuthorID = buf.ReadBytesNext(8)      // 0x04
+	mii.MiiID = buf.ReadBytesNext(10)        // 0x0C
+	mii.Unknown5 = buf.ReadBytesNext(2)      // 0x16
 
 	// seek the bitfield to offset 0x16*8 to align it with the byte buffer's offset
 	// (the bitfield takes offsets in terms of bits)
-	btf.Seek(0x16*8, false)
+	btf.Seek(0x18*8, false) // TODO: verify this offset
 
-	mii.Unknown6 = btf.ReadBitNext()   // 0x16
-	mii.Unknown7 = btf.ReadBitNext()   // 0x16.1
-	mii.Color    = btf.ReadBitsNext(4) // 0x16.2
+	mii.Unknown6 = btf.ReadBitNext()     // 0x16
+	mii.Unknown7 = btf.ReadBitNext()     // 0x16.1
+	mii.Color = btf.ReadBitsNext(4)      // 0x16.2
+	mii.BirthDay = btf.ReadBitsNext(5)   // 0x16.6
+	mii.BirthMonth = btf.ReadBitsNext(4) // 0x17.3
+	mii.Gender = btf.ReadBitNext()       // 0x17.7
+
+	// seek the byte buffer back to the proper spot
+	buf.Seek(0x18, false)
+
+	// TODO: optimize this for speed and make sure it works
+	tmp := buf.ReadBytesNext(20)
+	tmp2 := []rune{}
+	for len(tmp) > 0 {
+
+		r, size := utf8.DecodeRune(tmp)
+		tmp2 = append(tmp2, r)
+		tmp = tmp[size:]
+
+	}
+	mii.MiiName = string(tmp2)
 
 	return mii
 

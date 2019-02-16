@@ -48,23 +48,7 @@ type Parampack struct {
 }
 
 // NilParampack is a Parampack with no data
-var NilParampack = Parampack{
-	TitleID:            "0000000000000000",
-	AccessKey:          "",
-	PlatformID:         0,
-	RegionID:           0,
-	LanguageID:         0,
-	CountryID:          0,
-	AreaID:             0,
-	NetworkRestriction: 0,
-	FriendRestriction:  0,
-	RatingRestriction:  0,
-	RatingOrganization: 0,
-	TransferableID:     "",
-	TimezoneName:       "",
-	UTCOffset:          0,
-	RemasterVersion:    0,
-}
+var NilParampack = Parampack{}
 
 // FormatString formats the Parampack as a string
 func (p Parampack) FormatString() string {

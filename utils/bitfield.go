@@ -94,7 +94,7 @@ func (b *Bitfield) readbit(off int64) byte {
 }
 
 // readbits reads n bits from the bitfield at the specified offset
-func (b *Bitfield) readbits(off, n int64) (v int64) {
+func (b *Bitfield) readbits(off, n int64) (v uint64) {
 
 	if (off + n) > b.cap {
 
@@ -104,7 +104,7 @@ func (b *Bitfield) readbits(off, n int64) (v int64) {
 
 	for i := int64(0); i < n; i++ {
 
-		v = (v << uint64(1)) | int64(b.readbit(off+i))
+		v = (v << uint64(1)) | uint64(b.readbit(off+i))
 
 	}
 
@@ -343,7 +343,7 @@ func (b *Bitfield) ReadBit(off int64) byte {
 }
 
 // ReadBits returns the next n bits from the specified offset without modifying the internal offset value
-func (b *Bitfield) ReadBits(off, n int64) int64 {
+func (b *Bitfield) ReadBits(off, n int64) uint64 {
 
 	return b.readbits(off, n)
 
@@ -359,7 +359,7 @@ func (b *Bitfield) ReadBitNext() (out byte) {
 }
 
 // ReadBitsNext returns the next n bits from the current offset and moves the offset foward the amount of bits read
-func (b *Bitfield) ReadBitsNext(n int64) (out int64) {
+func (b *Bitfield) ReadBitsNext(n int64) (out uint64) {
 
 	out = b.readbits(b.off, n)
 	b.seek(n, true)
