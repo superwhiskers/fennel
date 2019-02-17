@@ -47,3 +47,30 @@ func ConvertInt64SliceToStringSlice(il []int64) (sl []string) {
 	return
 
 }
+
+// CRC16 computes the crc16 checksum of a byte array
+func CRC16(data []byte) (hash uint16) {
+
+	var flag uint16
+	hash = 0
+
+	for _, c := range data {
+
+		for i := 0; i < 8; i++ {
+
+			flag = hash & 0x8000
+			hash = (hash << 1) & 0xFFFF
+			if flag != 0x00 {
+
+				hash ^= 0x1021
+
+			}
+
+		}
+		hash ^= uint16(c)
+
+	}
+
+	return
+
+}

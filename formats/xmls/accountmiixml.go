@@ -57,7 +57,6 @@ type AccountMiiXMLMii struct {
 
 // AccountMiiXMLMiiImage represents an image of a nintendo network miis xml
 type AccountMiiXMLMiiImage struct {
-	XMLName   xml.Name `xml:"image"`
 	CachedURL string   `xml:"cached_url"`
 	ID        int64    `xml:"id"`
 	URL       string   `xml:"url"`

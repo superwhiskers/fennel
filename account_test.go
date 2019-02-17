@@ -206,6 +206,8 @@ func TestGetNNIDs(t *testing.T) {
 
 func TestGetMiis(t *testing.T) {
 
+	expectedOutput := []uint8{0xd0, 0xea, 0x35, 0x97, 0xcc, 0x40, 0xfd, 0x77}
+
 	client, err := NewAccountServerClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
 	if err != nil {
 
@@ -213,7 +215,7 @@ func TestGetMiis(t *testing.T) {
 
 	}
 
-	miis, exml, err := client.GetMiis([]int64{1794841894})
+	output, exml, err := client.GetMiis([]int64{1794841894})
 	if err != nil {
 
 		t.Errorf("expected no error to occur, instead got %v\n", err)
@@ -226,6 +228,14 @@ func TestGetMiis(t *testing.T) {
 
 	}
 
-	t.Logf("%#v\n", miis.Miis[0].Mii)
+	for i, b := range output.Miis[0].Mii.AuthorID {
+
+		if expectedOutput[i] != b {
+
+			t.Errorf("invalid output")
+
+		}
+
+	}
 
 }

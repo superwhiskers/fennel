@@ -22,7 +22,7 @@ package types
 
 import (
 	"unicode/utf8"
-	
+
 	"github.com/superwhiskers/fennel/utils"
 )
 
@@ -60,65 +60,65 @@ type Mii struct {
 	Checksum      uint16
 
 	// face
-	BlushType []byte
-	FaceStyle []byte
-	FaceColor []byte
-	FaceType  []byte
+	BlushType uint64
+	FaceStyle uint64
+	FaceColor uint64
+	FaceType  uint64
 
 	// hair
 	HairMirrored bool
-	HairColor    []byte
+	HairColor    uint64
 	HairType     uint8
 
 	// eyes
-	EyeThickness []byte
-	EyeScale     []byte
-	EyeColor     []byte
-	EyeType      []byte
-	EyeHeight    []byte
-	EyeDistance  []byte
-	EyeRotation  []byte
+	EyeThickness uint64
+	EyeScale     uint64
+	EyeColor     uint64
+	EyeType      uint64
+	EyeHeight    uint64
+	EyeDistance  uint64
+	EyeRotation  uint64
 
 	// eyebrow
-	EyebrowThickness []byte
-	EyebrowScale     []byte
-	EyebrowColor     []byte
-	EyebrowType      []byte
-	EyebrowHeight    []byte
-	EyebrowDistance  []byte
-	EyebrowRotation  []byte
+	EyebrowThickness uint64
+	EyebrowScale     uint64
+	EyebrowColor     uint64
+	EyebrowType      uint64
+	EyebrowHeight    uint64
+	EyebrowDistance  uint64
+	EyebrowRotation  uint64
 
 	// nose
-	NoseHeight []byte
-	NoseScale  []byte
-	NoseType   []byte
+	NoseHeight uint64
+	NoseScale  uint64
+	NoseType   uint64
 
 	// mouth
-	MouthThickness []byte
-	MouthScale     []byte
-	MouthColor     []byte
-	MouthType      []byte
-	MouthHeight    []byte
+	MouthThickness uint64
+	MouthScale     uint64
+	MouthColor     uint64
+	MouthType      uint64
+	MouthHeight    uint64
 
 	// mustache
-	MustacheType   []byte
-	MustacheHeight []byte
-	MustacheScale  []byte
+	MustacheType   uint64
+	MustacheHeight uint64
+	MustacheScale  uint64
 
 	// beard
-	BeardColor []byte
-	BeardType  []byte
+	BeardColor uint64
+	BeardType  uint64
 
 	// glasses
-	GlassesHeight []byte
-	GlassesScale  []byte
-	GlassesColor  []byte
-	GlassesType   []byte
+	GlassesHeight uint64
+	GlassesScale  uint64
+	GlassesColor  uint64
+	GlassesType   uint64
 
 	// mole
-	MoleY       []byte
-	MoleX       []byte
-	MoleScale   []byte
+	MoleY       uint64
+	MoleX       uint64
+	MoleScale   uint64
 	MoleEnabled bool
 }
 
@@ -136,7 +136,13 @@ func swapMiiEndiannessToLittle(data []byte) []byte {
 
 	}
 
-	for i := 0x30; i <= 0x5C; i += 2 {
+	for i := 0x30; i <= 0x48; i += 2 {
+
+		data = utils.Swapu16Little(data, i)
+
+	}
+
+	for i := 0x48; i <= 0x5C; i += 2 {
 
 		data = utils.Swapu16Little(data, i)
 
@@ -148,64 +154,171 @@ func swapMiiEndiannessToLittle(data []byte) []byte {
 
 }
 
+// converts a bit to a bool
+func bitToBool(data byte) bool {
+
+	if data == 0x00 {
+
+		return false
+
+	}
+	return true
+
+}
+
+// converts a uint64 to bool (nani)
+func u64ToBool(data uint64) bool {
+
+	if data == 0x00 {
+
+		return false
+
+	}
+	return true
+
+}
+
 // ParseMii takes a mii as a byte array and parses it to a Mii
+// TODO: potentially hardcode offsets for `Seek` calls
 func ParseMii(miiByte []byte) Mii {
 
 	buf := utils.NewByteBuffer(swapMiiEndiannessToLittle(miiByte))
 	btf := utils.NewBitfield(miiByte...)
 	mii := Mii{}
 
-	mii.BirthPlatform = btf.ReadBitsNext(4) // 0x00
-	mii.Unknown1 = btf.ReadBitsNext(4)      // 0x00.4
-	mii.Unknown2 = btf.ReadBitsNext(4)      // 0x01
-	mii.Unknown3 = btf.ReadBitsNext(4)      // 0x01.4
-	mii.FontRegion = btf.ReadBitsNext(4)    // 0x02
-	mii.RegionMove = btf.ReadBitsNext(2)    // 0x02.4
-	mii.Unknown4 = btf.ReadBitNext()        // 0x02.6
-	if btf.ReadBitNext() == 0x00 {          // 0x02.7
+	mii.BirthPlatform = btf.ReadBitsNext(4)
+	mii.Unknown1 = btf.ReadBitsNext(4)
+	mii.Unknown2 = btf.ReadBitsNext(4)
+	mii.Unknown3 = btf.ReadBitsNext(4)
+	mii.FontRegion = btf.ReadBitsNext(4)
+	mii.RegionMove = btf.ReadBitsNext(2)
+	mii.Unknown4 = btf.ReadBitNext()
+	mii.Copyable = bitToBool(btf.ReadBitNext())
 
-		mii.Copyable = false
+	buf.Seek(btf.Offset()/8, false)
 
-	} else {
+	mii.MiiVersion = buf.ReadBytesNext(1)[0]
+	mii.AuthorID = buf.ReadBytesNext(8)
+	mii.MiiID = buf.ReadBytesNext(10)
+	mii.Unknown5 = buf.ReadBytesNext(2)
 
-		mii.Copyable = true
+	btf.Seek(buf.Offset()*8, false)
 
-	}
+	mii.Unknown6 = btf.ReadBitNext()
+	mii.Unknown7 = btf.ReadBitNext()
+	mii.Color = btf.ReadBitsNext(4)
+	mii.BirthDay = btf.ReadBitsNext(5)
+	mii.BirthMonth = btf.ReadBitsNext(4)
+	mii.Gender = btf.ReadBitNext()
 
-	// seek the byte buffer to offset 0x03 to align it with the bitfield's offset
-	buf.Seek(0x03, false)
+	buf.Seek(btf.Offset()/8, false)
 
-	mii.MiiVersion = buf.ReadBytesNext(1)[0] // 0x03
-	mii.AuthorID = buf.ReadBytesNext(8)      // 0x04
-	mii.MiiID = buf.ReadBytesNext(10)        // 0x0C
-	mii.Unknown5 = buf.ReadBytesNext(2)      // 0x16
-
-	// seek the bitfield to offset 0x16*8 to align it with the byte buffer's offset
-	// (the bitfield takes offsets in terms of bits)
-	btf.Seek(0x18*8, false) // TODO: verify this offset
-
-	mii.Unknown6 = btf.ReadBitNext()     // 0x16
-	mii.Unknown7 = btf.ReadBitNext()     // 0x16.1
-	mii.Color = btf.ReadBitsNext(4)      // 0x16.2
-	mii.BirthDay = btf.ReadBitsNext(5)   // 0x16.6
-	mii.BirthMonth = btf.ReadBitsNext(4) // 0x17.3
-	mii.Gender = btf.ReadBitNext()       // 0x17.7
-
-	// seek the byte buffer back to the proper spot
-	buf.Seek(0x18, false)
-
-	// TODO: optimize this for speed and make sure it works
+	// TODO: potentially optimize this
 	tmp := buf.ReadBytesNext(20)
-	tmp2 := []rune{}
+	mii.MiiName = ""
 	for len(tmp) > 0 {
 
 		r, size := utf8.DecodeRune(tmp)
-		tmp2 = append(tmp2, r)
 		tmp = tmp[size:]
+		if r == 0 {
+
+			continue
+
+		}
+		mii.MiiName = mii.MiiName + string(r)
 
 	}
-	mii.MiiName = string(tmp2)
 
+	mii.Fatness = buf.ReadBytesNext(1)[0]
+	mii.Size = buf.ReadBytesNext(1)[0]
+
+	btf.Seek(buf.Offset()*8, false)
+
+	mii.BlushType = btf.ReadBitsNext(4)
+	mii.FaceStyle = btf.ReadBitsNext(4)
+	mii.FaceColor = btf.ReadBitsNext(3)
+	mii.FaceType = btf.ReadBitsNext(4)
+	mii.LocalOnly = bitToBool(btf.ReadBitNext())
+	mii.HairMirrored = u64ToBool(btf.ReadBitsNext(5))
+	mii.HairColor = btf.ReadBitsNext(3)
+
+	buf.Seek(btf.Offset()/8, false)
+
+	mii.HairType = buf.ReadBytesNext(1)[0]
+
+	btf.Seek(buf.Offset()*8, false)
+
+	mii.EyeThickness = btf.ReadBitsNext(3)
+	mii.EyeScale = btf.ReadBitsNext(4)
+	mii.EyeColor = btf.ReadBitsNext(3)
+	mii.EyeType = btf.ReadBitsNext(6)
+	mii.EyeHeight = btf.ReadBitsNext(7)
+	mii.EyeDistance = btf.ReadBitsNext(4)
+	mii.EyeRotation = btf.ReadBitsNext(5)
+
+	mii.EyebrowThickness = btf.ReadBitsNext(4)
+	mii.EyebrowScale = btf.ReadBitsNext(4)
+	mii.EyebrowColor = btf.ReadBitsNext(3)
+	mii.EyebrowType = btf.ReadBitsNext(5)
+	mii.EyebrowHeight = btf.ReadBitsNext(7)
+	mii.EyebrowDistance = btf.ReadBitsNext(4)
+	mii.EyebrowRotation = btf.ReadBitsNext(5)
+
+	mii.NoseHeight = btf.ReadBitsNext(7)
+	mii.NoseScale = btf.ReadBitsNext(4)
+	mii.NoseType = btf.ReadBitsNext(5)
+
+	mii.MouthThickness = btf.ReadBitsNext(3)
+	mii.MouthScale = btf.ReadBitsNext(4)
+	mii.MouthColor = btf.ReadBitsNext(3)
+	mii.MouthType = btf.ReadBitsNext(6)
+
+	buf.Seek(btf.Offset()/8, false)
+	
+	mii.Unknown8 = buf.ReadBytesNext(1)[0]
+
+	btf.Seek(buf.Offset()*8, false)
+
+	mii.MustacheType = btf.ReadBitsNext(3)
+	mii.MouthHeight = btf.ReadBitsNext(5)
+	mii.MustacheHeight = btf.ReadBitsNext(6)
+	mii.MustacheScale = btf.ReadBitsNext(4)
+	mii.BeardColor = btf.ReadBitsNext(3)
+	mii.BeardType = btf.ReadBitsNext(3)
+
+	mii.GlassesHeight = btf.ReadBitsNext(5)
+	mii.GlassesScale = btf.ReadBitsNext(4)
+	mii.GlassesColor = btf.ReadBitsNext(3)
+	mii.GlassesType = btf.ReadBitsNext(4)
+	mii.Unknown9 = btf.ReadBitNext()
+	mii.MoleY = btf.ReadBitsNext(5)
+	mii.MoleX = btf.ReadBitsNext(5)
+	mii.MoleScale = btf.ReadBitsNext(4)
+	mii.MoleEnabled = bitToBool(btf.ReadBitNext())
+
+	buf.Seek(btf.Offset()/8, false)
+
+	// TODO: potentially optimize this too
+	tmp = buf.ReadBytesNext(20)
+	mii.AuthorName = ""
+	for len(tmp) > 0 {
+
+		r, size := utf8.DecodeRune(tmp)
+		tmp = tmp[size:]
+		if r == 0 {
+
+			continue
+
+		}
+		mii.AuthorName = mii.AuthorName + string(r)
+
+	}
+
+	mii.Unknown10 = buf.ReadBytesNext(2)
+	mii.Checksum = buf.ReadComplexNext(1, utils.Unsigned16, utils.LittleEndian).([]uint16)[0]
+
+	// TODO: add proper checksum validation
+	
 	return mii
 
 }
