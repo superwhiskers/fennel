@@ -20,7 +20,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package utils
 
-import "strconv"
+import (
+	"strconv"
+	"unicode/utf8"
+)
 
 // ApplyByteSliceAtOffset applies a byte slice to another byte slice at the specified offset, overwriting any existing indexes already in the slice
 func ApplyByteSliceAtOffset(src, dest []byte, offset int) []byte {
@@ -71,6 +74,30 @@ func CRC16(data []byte) (hash uint16) {
 
 	}
 
+	return
+
+}
+
+// DecodeUTF8String decodes a string from a byte array encoded in utf8
+func DecodeUTF8String(b []byte) (s string) {
+
+	s = ""
+	var (
+		r    rune
+		size int
+	)
+	for len(b) > 0 {
+
+		r, size = utf8.DecodeRune(b)
+		b = b[size:]
+		if r == 0 {
+
+			continue
+
+		}
+		s = s + string(r)
+
+	}
 	return
 
 }
