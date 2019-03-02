@@ -1,7 +1,7 @@
 /*
 
 fennel - nintendo network utility library for golang
-Copyright (C) 2018 superwhiskers <whiskerdev@protonmail.com>
+Copyright (C) 2018-2019 superwhiskers <whiskerdev@protonmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
