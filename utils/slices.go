@@ -78,8 +78,8 @@ func CRC16(data []byte) (hash uint16) {
 
 }
 
-// DecodeUTF8String decodes a string from a byte array encoded in utf8
-func DecodeUTF8String(b []byte) (s string) {
+// DecodeUTF8StringFromBytes decodes a string from a byte array encoded in utf8
+func DecodeUTF8StringFromBytes(b []byte) (s string) {
 
 	s = ""
 	var (
@@ -97,6 +97,22 @@ func DecodeUTF8String(b []byte) (s string) {
 		}
 		s = s + string(r)
 
+	}
+	return
+
+}
+
+// EncodeBytesFromUTF8String encodes a byte array in utf8 from a string
+func EncodeBytesFromUTF8String(s string) (b []byte) {
+
+	b = []byte{}
+	var tb []byte
+	for i := 0; i < len(s); i++ {
+
+		tb = make([]byte, utf8.RuneLen(rune(s[i])))
+		_ = utf8.EncodeRune(tb, rune(s[i]))
+		b = append(b, tb...)
+		
 	}
 	return
 

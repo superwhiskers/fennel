@@ -45,7 +45,7 @@ func (a AccountMiiXML) FormatXML() ([]byte, error) {
 
 // AccountMiiXMLMii represents a mii in a nintendo network miis xml
 type AccountMiiXMLMii struct {
-	Mii     types.Mii               `xml:"-"`
+	Mii     *types.Mii               `xml:"-"`
 	Data    string                  `xml:"data"`
 	ID      int64                   `xml:"id"`
 	Name    string                  `xml:"name"`

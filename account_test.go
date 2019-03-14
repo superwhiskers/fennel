@@ -23,6 +23,7 @@ package fennel
 import (
 	"crypto/tls"
 	"testing"
+	"encoding/base64"
 
 	"github.com/valyala/fasthttp"
 )
@@ -235,6 +236,33 @@ func TestGetMiis(t *testing.T) {
 			t.Errorf("invalid output")
 
 		}
+
+	}
+
+}
+
+// temporary test function, will be removed later
+func TestVerifyMii(t *testing.T) {
+
+	client, err := NewAccountServerClient("https://account.nintendo.net/v1/api", "keypair/ctr-common-cert.pem", "keypair/ctr-common-key.pem", clientInfo)
+	if err != nil {
+
+		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	output, _, err := client.GetMiis([]int64{1794841894})
+	if err != nil {
+
+		t.Errorf("expected no error to occur, instead got %v\n", err)
+
+	}
+
+	if output.Miis[0].Data != base64.StdEncoding.EncodeToString(output.Miis[0].Mii.Encode()) {
+
+		t.Logf("original data: %#v", output.Miis[0].Data)
+		t.Logf("encoded data: %#v", base64.StdEncoding.EncodeToString(output.Miis[0].Mii.Encode()))
+		t.Errorf("encoded Mii != original data")
 
 	}
 

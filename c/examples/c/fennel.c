@@ -1,6 +1,7 @@
 // fennel.c - test code for libfennel
 #include <stdio.h>
-#include <argp.h>
+//#include <argp.h>
+#include "argp.h"
 #include "fennel.h"
 
 const char *argp_program_version = "fennel-c v1";
