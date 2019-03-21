@@ -51,7 +51,7 @@ type ErrorXMLError struct {
 // Error returns a console-friendly version of the error contained in the struct
 func (e ErrorXMLError) Error() string {
 
-	return fmt.Sprintf("code %s, caused by: %s: %s", e.Code, e.Cause, e.Message)
+	return fmt.Sprintf("code %s: %s", e.Code, e.Cause, e.Message)
 
 }
 
