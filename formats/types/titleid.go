@@ -68,7 +68,7 @@ func ParseWiiUTID(wiiuTID string) (TitleID, error) {
 
 	}
 
-	copy(tid[:], sliceTID[:])
+	copy(tid[:], sliceTID)
 
 	return tid, nil
 

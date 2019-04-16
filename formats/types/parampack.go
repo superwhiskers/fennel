@@ -231,6 +231,6 @@ func ParseParampack(parampack string) (Parampack, error) {
 
 	}
 
-	return ParseStringParampack(string(decodedParampack[:])), nil
+	return ParseStringParampack(string(decodedParampack)), nil
 
 }

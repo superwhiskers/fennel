@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package errors
 
-// AccountServerError represents an error recieved from the nintendo network account server
+// AccountServerError represents an error received from the nintendo network account server
 type AccountServerError string
 
 // account server error constants. errors marked with pretendo-specific are error codes that appear to be specific to the pretendo implementation of nintendo network

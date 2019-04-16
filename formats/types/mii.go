@@ -21,8 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package types
 
 import (
-	"github.com/superwhiskers/fennel/utils"
 	"github.com/superwhiskers/crunch"
+	"github.com/superwhiskers/fennel/utils"
 )
 
 // swaps the endianness of a mii binary format to little-endian
@@ -98,31 +98,7 @@ func bitToBool(data byte) bool {
 // converts a bool to a bit
 func boolToBit(data bool) byte {
 
-	if data == false {
-
-		return 0x00
-
-	}
-	return 0x01
-
-}
-
-// converts a uint64 to bool (nani)
-func u64ToBool(data uint64) bool {
-
-	if data == 0x00 {
-
-		return false
-
-	}
-	return true
-
-}
-
-// converts a bool to a uint64 (owo)
-func boolTou64(data bool) uint64 {
-
-	if data == false {
+	if !data {
 
 		return 0x00
 
@@ -318,7 +294,7 @@ func (mii *Mii) Parse(miiByte []byte) {
 	mii.MouthType = buf.ReadBitsNext(6)
 
 	buf.AlignByte()
-	
+
 	mii.Unknown8 = buf.ReadByteNext()
 
 	buf.AlignBit()
@@ -422,7 +398,7 @@ func (mii *Mii) Encode() []byte {
 	buf.SetBitsNext(mii.NoseHeight, 7)
 	buf.SetBitsNext(mii.NoseScale, 4)
 	buf.SetBitsNext(mii.NoseType, 5)
-	
+
 	buf.SetBitsNext(mii.MouthThickness, 3)
 	buf.SetBitsNext(mii.MouthScale, 4)
 	buf.SetBitsNext(mii.MouthColor, 3)
@@ -452,12 +428,12 @@ func (mii *Mii) Encode() []byte {
 	buf.SetBitNext(boolToBit(mii.MoleEnabled))
 
 	buf.AlignByte()
-	
+
 	buf.WriteBytesNext(utils.EncodeBytesFromUTF8String(mii.AuthorName))
 	buf.WriteBytesNext(mii.Unknown10)
 	buf.WriteBytes(0x00, swapMiiEndiannessToBig(buf.Bytes()))
 	buf.WriteComplexNext([]uint16{utils.CRC16(buf.Bytes())}, crunch.Unsigned16, crunch.LittleEndian)
 
 	return buf.Bytes()
-	
+
 }

@@ -23,7 +23,7 @@ package errors
 import "fmt"
 
 // FennelError implements a custom error type used in fennel
-type FennelError struct{
+type FennelError struct {
 	scope string
 	error string
 }

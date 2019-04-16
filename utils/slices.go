@@ -95,7 +95,7 @@ func DecodeUTF8StringFromBytes(b []byte) (s string) {
 			continue
 
 		}
-		s = s + string(r)
+		s += string(r)
 
 	}
 	return
@@ -112,7 +112,7 @@ func EncodeBytesFromUTF8String(s string) (b []byte) {
 		tb = make([]byte, utf8.RuneLen(rune(s[i])))
 		_ = utf8.EncodeRune(tb, rune(s[i]))
 		b = append(b, tb...)
-		
+
 	}
 	return
 

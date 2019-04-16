@@ -22,7 +22,7 @@ package xmls
 
 import "encoding/xml"
 
-// NillMappedIDsXML represents a MappedIDsXML with no value
+// NilMappedIDsXML represents a MappedIDsXML with no value
 var NilMappedIDsXML = MappedIDsXML{}
 
 // MappedIDsXML represents a nintendo network mappedids xml sheet

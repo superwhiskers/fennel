@@ -40,9 +40,9 @@ type AccountServerClient struct {
 }
 
 // NewAccountServerClient is a constructor function for creating a client for the nintendo network account servers
-func NewAccountServerClient(accountServer string, certificatePath string, keyPath string, clientInfo ClientInformation) (*AccountServerClient, error) {
+func NewAccountServerClient(accountServer string, certificate []byte, key []byte, clientInfo ClientInformation) (*AccountServerClient, error) {
 
-	keyPair, err := tls.LoadX509KeyPair(certificatePath, keyPath)
+	keyPair, err := tls.X509KeyPair(certificate, key)
 	if err != nil {
 
 		return &AccountServerClient{}, err

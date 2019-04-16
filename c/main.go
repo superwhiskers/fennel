@@ -39,9 +39,9 @@ var noError = C.struct_fennel_Error{
 }
 
 //export fennel_newAccountServerClient
-func fennel_newAccountServerClient(accountServer, certificatePath, keyPath *C.char, clientInfo C.struct_fennel_ClientInformation, errorPointer **C.struct_fennel_Error) C.fennel_AccountServerClient {
+func fennel_newAccountServerClient(accountServer *C.char, certificate *C.char, certificateLength C.int, key *C.char, keyLength C.int, clientInfo C.struct_fennel_ClientInformation, errorPointer **C.struct_fennel_Error) C.fennel_AccountServerClient {
 
-	client, err := fennel.NewAccountServerClient(gostring(accountServer), gostring(certificatePath), gostring(keyPath), fennel.ClientInformation{
+	client, err := fennel.NewAccountServerClient(gostring(accountServer), C.GoBytes(unsafe.Pointer(certificate), certificateLength), C.GoBytes(unsafe.Pointer(key), keyLength), fennel.ClientInformation{
 		ClientID:     gostring(clientInfo.ClientID),
 		ClientSecret: gostring(clientInfo.ClientSecret),
 		DeviceCert:   gostring(clientInfo.DeviceCert),
