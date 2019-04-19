@@ -356,6 +356,7 @@ func (mii *Mii) Parse(miiByte []byte) {
 
 // Encode takes a Mii and encodes it as a byte array
 // TODO: potentially hardcode offsets for `Seek` calls
+// TODO: switch to `MiniBuffer` instead of using `Buffer`
 func (mii *Mii) Encode() []byte {
 
 	buf := crunch.NewBuffer(make([]byte, 0x60))
