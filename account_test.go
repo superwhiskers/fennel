@@ -322,6 +322,8 @@ func TestVerifyMii(t *testing.T) {
 
 	}
 
+	t.Logf("%#v", output.Miis[0].Data)
+
 	if output.Miis[0].Data != base64.StdEncoding.EncodeToString(output.Miis[0].Mii.Encode()) {
 
 		t.Logf("original data: %#v", output.Miis[0].Data)

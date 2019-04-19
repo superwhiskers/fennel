@@ -219,108 +219,136 @@ func ParseMii(miiByte []byte) *Mii {
 // TODO: potentially hardcode offsets for `Seek` calls
 func (mii *Mii) Parse(miiByte []byte) {
 
-	buf := crunch.NewBuffer(swapMiiEndiannessToLittle(miiByte))
+	var (
+		tmp1 byte
+		tmp2 []byte
+		tmp3 interface{}
+	)
+	
+	buf := &crunch.MiniBuffer{}
+	crunch.NewMiniBuffer(&buf, swapMiiEndiannessToLittle(miiByte))
 
-	mii.BirthPlatform = buf.ReadBitsNext(4)
-	mii.Unknown1 = buf.ReadBitsNext(4)
-	mii.Unknown2 = buf.ReadBitsNext(4)
-	mii.Unknown3 = buf.ReadBitsNext(4)
-	mii.FontRegion = buf.ReadBitsNext(4)
-	mii.RegionMove = buf.ReadBitsNext(2)
-	mii.Unknown4 = buf.ReadBitNext()
-	mii.Copyable = bitToBool(buf.ReadBitNext())
+	buf.ReadBitsNext(&mii.BirthPlatform, 4)
+	buf.ReadBitsNext(&mii.Unknown1, 4)
+	buf.ReadBitsNext(&mii.Unknown2, 4)
+	buf.ReadBitsNext(&mii.Unknown3, 4)
+	buf.ReadBitsNext(&mii.FontRegion, 4)
+	buf.ReadBitsNext(&mii.RegionMove, 2)
+	buf.ReadBitNext(&mii.Unknown4)
+
+	buf.ReadBitNext(&tmp1)
+	mii.Copyable = bitToBool(tmp1)
 
 	buf.AlignByte()
 
-	mii.MiiVersion = buf.ReadByteNext()
-	mii.AuthorID = buf.ReadBytesNext(8)
-	mii.MiiID = buf.ReadBytesNext(10)
-	mii.Unknown5 = buf.ReadBytesNext(2)
+	buf.ReadBytesNext(&tmp2, 1)
+	mii.MiiVersion = tmp2[0]
+
+	buf.ReadBytesNext(&mii.AuthorID, 8)
+	buf.ReadBytesNext(&mii.MiiID, 10)
+	buf.ReadBytesNext(&mii.Unknown5, 2)
 
 	buf.AlignBit()
 
-	mii.Unknown6 = buf.ReadBitNext()
-	mii.Unknown7 = buf.ReadBitNext()
-	mii.Color = buf.ReadBitsNext(4)
-	mii.BirthDay = buf.ReadBitsNext(5)
-	mii.BirthMonth = buf.ReadBitsNext(4)
-	mii.Gender = buf.ReadBitNext()
+	buf.ReadBitNext(&mii.Unknown6)
+	buf.ReadBitNext(&mii.Unknown7)
+	buf.ReadBitsNext(&mii.Color, 4)
+	buf.ReadBitsNext(&mii.BirthDay, 5)
+	buf.ReadBitsNext(&mii.BirthMonth, 4)
+	buf.ReadBitNext(&mii.Gender)
 
 	buf.AlignByte()
 
-	mii.MiiName = utils.DecodeUTF8StringFromBytes(buf.ReadBytesNext(20))
-	mii.Fatness = buf.ReadByteNext()
-	mii.Size = buf.ReadByteNext()
+	buf.ReadBytesNext(&tmp2, 20)
+	mii.MiiName = utils.DecodeUTF8StringFromBytes(tmp2)
+
+	buf.ReadBytesNext(&tmp2, 1)
+	mii.Fatness = tmp2[0]
+
+	buf.ReadBytesNext(&tmp2, 1)
+	mii.Size = tmp2[0]
 
 	buf.AlignBit()
 
-	mii.BlushType = buf.ReadBitsNext(4)
-	mii.FaceStyle = buf.ReadBitsNext(4)
-	mii.FaceColor = buf.ReadBitsNext(3)
-	mii.FaceType = buf.ReadBitsNext(4)
-	mii.LocalOnly = bitToBool(buf.ReadBitNext())
-	mii.HairMirrored = buf.ReadBitsNext(5)
-	mii.HairColor = buf.ReadBitsNext(3)
+	buf.ReadBitsNext(&mii.BlushType, 4)
+	buf.ReadBitsNext(&mii.FaceStyle, 4)
+	buf.ReadBitsNext(&mii.FaceColor, 3)
+	buf.ReadBitsNext(&mii.FaceType, 4)
+	
+	buf.ReadBitNext(&tmp1)
+	mii.LocalOnly = bitToBool(tmp1)
+
+	buf.ReadBitsNext(&mii.HairMirrored, 5)
+	buf.ReadBitsNext(&mii.HairColor, 3)
 
 	buf.AlignByte()
 
-	mii.HairType = buf.ReadByteNext()
+	buf.ReadBytesNext(&tmp2, 1)
+	mii.HairType = tmp2[0]
 
 	buf.AlignBit()
 
-	mii.EyeThickness = buf.ReadBitsNext(3)
-	mii.EyeScale = buf.ReadBitsNext(4)
-	mii.EyeColor = buf.ReadBitsNext(3)
-	mii.EyeType = buf.ReadBitsNext(6)
-	mii.EyeHeight = buf.ReadBitsNext(7)
-	mii.EyeDistance = buf.ReadBitsNext(4)
-	mii.EyeRotation = buf.ReadBitsNext(5)
+	buf.ReadBitsNext(&mii.EyeThickness, 3)
+	buf.ReadBitsNext(&mii.EyeScale, 4)
+	buf.ReadBitsNext(&mii.EyeColor, 3)
+	buf.ReadBitsNext(&mii.EyeType, 6)
+	buf.ReadBitsNext(&mii.EyeHeight, 7)
+	buf.ReadBitsNext(&mii.EyeDistance, 4)
+	buf.ReadBitsNext(&mii.EyeRotation, 5)
 
-	mii.EyebrowThickness = buf.ReadBitsNext(4)
-	mii.EyebrowScale = buf.ReadBitsNext(4)
-	mii.EyebrowColor = buf.ReadBitsNext(3)
-	mii.EyebrowType = buf.ReadBitsNext(5)
-	mii.EyebrowHeight = buf.ReadBitsNext(7)
-	mii.EyebrowDistance = buf.ReadBitsNext(4)
-	mii.EyebrowRotation = buf.ReadBitsNext(5)
+	buf.ReadBitsNext(&mii.EyebrowThickness, 4)
+	buf.ReadBitsNext(&mii.EyebrowScale, 4)
+	buf.ReadBitsNext(&mii.EyebrowColor, 3)
+	buf.ReadBitsNext(&mii.EyebrowType, 5)
+	buf.ReadBitsNext(&mii.EyebrowHeight, 7)
+	buf.ReadBitsNext(&mii.EyebrowDistance, 4)
+	buf.ReadBitsNext(&mii.EyebrowRotation, 5)
 
-	mii.NoseHeight = buf.ReadBitsNext(7)
-	mii.NoseScale = buf.ReadBitsNext(4)
-	mii.NoseType = buf.ReadBitsNext(5)
+	buf.ReadBitsNext(&mii.NoseHeight, 7)
+	buf.ReadBitsNext(&mii.NoseScale, 4)
+	buf.ReadBitsNext(&mii.NoseType, 5)
 
-	mii.MouthThickness = buf.ReadBitsNext(3)
-	mii.MouthScale = buf.ReadBitsNext(4)
-	mii.MouthColor = buf.ReadBitsNext(3)
-	mii.MouthType = buf.ReadBitsNext(6)
+	buf.ReadBitsNext(&mii.MouthThickness, 3)
+	buf.ReadBitsNext(&mii.MouthScale, 4)
+	buf.ReadBitsNext(&mii.MouthColor, 3)
+	buf.ReadBitsNext(&mii.MouthType, 6)
 
 	buf.AlignByte()
 
-	mii.Unknown8 = buf.ReadByteNext()
+	buf.ReadBytesNext(&tmp2, 1)
+	mii.Unknown8 = tmp2[0]
 
 	buf.AlignBit()
 
-	mii.MustacheType = buf.ReadBitsNext(3)
-	mii.MouthHeight = buf.ReadBitsNext(5)
-	mii.MustacheHeight = buf.ReadBitsNext(6)
-	mii.MustacheScale = buf.ReadBitsNext(4)
-	mii.BeardColor = buf.ReadBitsNext(3)
-	mii.BeardType = buf.ReadBitsNext(3)
+	buf.ReadBitsNext(&mii.MustacheType, 3)
+	buf.ReadBitsNext(&mii.MouthHeight, 5)
+	buf.ReadBitsNext(&mii.MustacheHeight, 6)
+	buf.ReadBitsNext(&mii.MustacheScale, 4)
+	buf.ReadBitsNext(&mii.BeardColor, 3)
+	buf.ReadBitsNext(&mii.BeardType, 3)
 
-	mii.GlassesHeight = buf.ReadBitsNext(5)
-	mii.GlassesScale = buf.ReadBitsNext(4)
-	mii.GlassesColor = buf.ReadBitsNext(3)
-	mii.GlassesType = buf.ReadBitsNext(4)
-	mii.Unknown9 = buf.ReadBitNext()
-	mii.MoleY = buf.ReadBitsNext(5)
-	mii.MoleX = buf.ReadBitsNext(5)
-	mii.MoleScale = buf.ReadBitsNext(4)
-	mii.MoleEnabled = bitToBool(buf.ReadBitNext())
+	buf.ReadBitsNext(&mii.GlassesHeight, 5)
+	buf.ReadBitsNext(&mii.GlassesScale, 4)
+	buf.ReadBitsNext(&mii.GlassesColor, 3)
+	buf.ReadBitsNext(&mii.GlassesType, 4)
+	buf.ReadBitNext(&mii.Unknown9)
+	
+	buf.ReadBitsNext(&mii.MoleY, 5)
+	buf.ReadBitsNext(&mii.MoleX, 5)
+	buf.ReadBitsNext(&mii.MoleScale, 4)
+
+	buf.ReadBitNext(&tmp1)
+	mii.MoleEnabled = bitToBool(tmp1)
 
 	buf.AlignByte()
 
-	mii.AuthorName = utils.DecodeUTF8StringFromBytes(buf.ReadBytesNext(20))
-	mii.Unknown10 = buf.ReadBytesNext(2)
-	mii.Checksum = buf.ReadComplexNext(1, crunch.Unsigned16, crunch.LittleEndian).([]uint16)[0]
+	buf.ReadBytesNext(&tmp2, 20)
+	mii.AuthorName = utils.DecodeUTF8StringFromBytes(tmp2)
+
+	buf.ReadBytesNext(&mii.Unknown10, 2)
+
+	buf.ReadComplexNext(&tmp3, 1, crunch.Unsigned16, crunch.LittleEndian)
+	mii.Checksum = tmp3.([]uint16)[0]
 
 	// TODO: add proper checksum validation
 
