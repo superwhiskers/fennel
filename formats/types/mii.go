@@ -86,12 +86,7 @@ func swapMiiEndiannessToBig(data []byte) []byte {
 // converts a bit to a bool
 func bitToBool(data byte) bool {
 
-	if data == 0x00 {
-
-		return false
-
-	}
-	return true
+	return data != 0x00
 
 }
 
@@ -224,7 +219,7 @@ func (mii *Mii) Parse(miiByte []byte) {
 		tmp2 []byte
 		tmp3 interface{}
 	)
-	
+
 	buf := &crunch.MiniBuffer{}
 	crunch.NewMiniBuffer(&buf, swapMiiEndiannessToLittle(miiByte))
 
@@ -274,7 +269,7 @@ func (mii *Mii) Parse(miiByte []byte) {
 	buf.ReadBitsNext(&mii.FaceStyle, 4)
 	buf.ReadBitsNext(&mii.FaceColor, 3)
 	buf.ReadBitsNext(&mii.FaceType, 4)
-	
+
 	buf.ReadBitNext(&tmp1)
 	mii.LocalOnly = bitToBool(tmp1)
 
@@ -332,7 +327,7 @@ func (mii *Mii) Parse(miiByte []byte) {
 	buf.ReadBitsNext(&mii.GlassesColor, 3)
 	buf.ReadBitsNext(&mii.GlassesType, 4)
 	buf.ReadBitNext(&mii.Unknown9)
-	
+
 	buf.ReadBitsNext(&mii.MoleY, 5)
 	buf.ReadBitsNext(&mii.MoleX, 5)
 	buf.ReadBitsNext(&mii.MoleScale, 4)

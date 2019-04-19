@@ -1,8 +1,8 @@
 package types
 
 import (
-	"testing"
 	"encoding/base64"
+	"testing"
 )
 
 var data = "AwEAQNDqNZfMQP131K+wv1n8kW4jgAAApltTAEMATwBUAFQAMAA4ADUAMgAAAGc5AgA5B7RIRBL3IsQGrQwTagwAOCmxMUhQUwBjAG8AdAB0ACAATQAuAAAAAAAAAA50"
@@ -10,7 +10,7 @@ var data = "AwEAQNDqNZfMQP131K+wv1n8kW4jgAAApltTAEMATwBUAFQAMAA4ADUAMgAAAGc5AgA5
 func BenchmarkParseMii(b *testing.B) {
 
 	b.ReportAllocs()
-	
+
 	data, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
 

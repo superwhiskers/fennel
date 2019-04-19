@@ -3,6 +3,7 @@ github.com/klauspost/compress v1.4.0 h1:8nsMz3tWa9SWWPL60G1V6CUsf4lLjWLTNEtibhe8
 github.com/klauspost/compress v1.4.0/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
 github.com/klauspost/cpuid v0.0.0-20180405133222-e7e905edc00e h1:+lIPJOWl+jSiJOc70QXJ07+2eg2Jy2EC7Mi11BWujeM=
 github.com/klauspost/cpuid v0.0.0-20180405133222-e7e905edc00e/go.mod h1:Pj4uuM528wm8OyEC2QMXAi2YiTZ96dNQPGgoMS4s3ek=
+github.com/mdempsky/maligned v0.0.0-20180708014732-6e39bd26a8c8/go.mod h1:oGVD62YTpMEWw0JqJ2Vl48dzHywJBMlapkfsmhtokOU=
 github.com/superwhiskers/crunch v0.0.0-20190228224020-c9007dbf76d0 h1:y7NoMN7rDN2tZT1pB09p4pMmpRABnK4t05vjwhmxXNs=
 github.com/superwhiskers/crunch v0.0.0-20190228224020-c9007dbf76d0/go.mod h1:0krE1Ye2uOCF+IKFt3GAlZQ5gwWHVheHwLD7XNuBQY8=
 github.com/superwhiskers/crunch v0.0.0-20190308200209-093e18c5bc83 h1:k/SNu2USUVTQ1ayolTypd8NvEyweAWsceB8m5luI5vE=
