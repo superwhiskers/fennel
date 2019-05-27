@@ -217,7 +217,7 @@ func (mii *Mii) Parse(miiByte []byte) {
 	var (
 		tmp1 byte
 		tmp2 []byte
-		tmp3 interface{}
+		tmp3 []uint16
 	)
 
 	buf := &crunch.MiniBuffer{}
@@ -342,8 +342,9 @@ func (mii *Mii) Parse(miiByte []byte) {
 
 	buf.ReadBytesNext(&mii.Unknown10, 2)
 
-	buf.ReadComplexNext(&tmp3, 1, crunch.Unsigned16, crunch.LittleEndian)
-	mii.Checksum = tmp3.([]uint16)[0]
+	tmp3 = []uint16{0x00}
+	buf.ReadU16LENext(&tmp3, 1)
+	mii.Checksum = tmp3[0]
 
 	// TODO: add proper checksum validation
 
@@ -456,7 +457,7 @@ func (mii *Mii) Encode() []byte {
 	buf.WriteBytesNext(utils.EncodeBytesFromUTF8String(mii.AuthorName))
 	buf.WriteBytesNext(mii.Unknown10)
 	buf.WriteBytes(0x00, swapMiiEndiannessToBig(buf.Bytes()))
-	buf.WriteComplexNext([]uint16{utils.CRC16(buf.Bytes())}, crunch.Unsigned16, crunch.LittleEndian)
+	buf.WriteU16LENext([]uint16{utils.CRC16(buf.Bytes())})
 
 	return buf.Bytes()
 

@@ -10,6 +10,8 @@ github.com/superwhiskers/crunch v0.0.0-20190308200209-093e18c5bc83 h1:k/SNu2USUV
 github.com/superwhiskers/crunch v0.0.0-20190308200209-093e18c5bc83/go.mod h1:0krE1Ye2uOCF+IKFt3GAlZQ5gwWHVheHwLD7XNuBQY8=
 github.com/superwhiskers/crunch v0.0.0-20190308204042-ba7804ec2af7 h1:pi6PXOof+IKG21TA0qxRj52g35iud4xcnYtIAMlgMkM=
 github.com/superwhiskers/crunch v0.0.0-20190308204042-ba7804ec2af7/go.mod h1:0krE1Ye2uOCF+IKFt3GAlZQ5gwWHVheHwLD7XNuBQY8=
+github.com/superwhiskers/crunch v0.0.0-20190527065233-41a5dcbf1a47 h1:rFPNSnHI9/XlFcaqVy48xMvQJI51hHKeU/SOMu/uQlY=
+github.com/superwhiskers/crunch v0.0.0-20190527065233-41a5dcbf1a47/go.mod h1:gMTDRBtldLvMme5GFubPOneNkAsztJeTWIpTJrQJh74=
 github.com/superwhiskers/crunch v1.0.0 h1:gzsf72FCZpVb9Oi+hYxLfqKh94Wn3cSc90niPBJLrCU=
 github.com/superwhiskers/crunch v1.0.0/go.mod h1:gMTDRBtldLvMme5GFubPOneNkAsztJeTWIpTJrQJh74=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=

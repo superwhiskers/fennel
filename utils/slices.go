@@ -28,10 +28,19 @@ import (
 // ApplyByteSliceAtOffset applies a byte slice to another byte slice at the specified offset, overwriting any existing indexes already in the slice
 func ApplyByteSliceAtOffset(src, dest []byte, offset int) []byte {
 
-	for i, byt := range src {
+	var (
+		i = 0
+		n = len(src)
+	)
+	{
+	apply_loop:
+		dest[offset+i] = src[i]
+		i++
+		if i < n {
 
-		dest[offset+i] = byt
+			goto apply_loop
 
+		}
 	}
 	return dest
 
@@ -54,13 +63,17 @@ func ConvertInt64SliceToStringSlice(il []int64) (sl []string) {
 // CRC16 computes the crc16 checksum of a byte array
 func CRC16(data []byte) (hash uint16) {
 
-	var flag uint16
-	hash = 0
+	var (
+		flag uint16
 
-	for _, c := range data {
-
-		for i := 0; i < 8; i++ {
-
+		i = 0
+		n = len(data)
+	)
+	{
+	sum_loop:
+		i2 := 0
+		{
+		hash_add_loop:
 			flag = hash & 0x8000
 			hash = (hash << 1) & 0xFFFF
 			if flag != 0x00 {
@@ -68,10 +81,20 @@ func CRC16(data []byte) (hash uint16) {
 				hash ^= 0x1021
 
 			}
+			i2++
+			if i2 < 8 {
+				
+				goto hash_add_loop
+
+			}
+		}
+		hash ^= uint16(data[i])
+		i++
+		if i < n {
+
+			goto sum_loop
 
 		}
-		hash ^= uint16(c)
-
 	}
 
 	return
