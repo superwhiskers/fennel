@@ -357,7 +357,7 @@ func (mii *Mii) Encode() []byte {
 
 	buf := crunch.NewBuffer(make([]byte, 0x60))
 
-	buf.SetBitsNext(mii.BirthPlatform, 4)
+	/*buf.SetBitsNext(mii.BirthPlatform, 4)
 	buf.SetBitsNext(mii.Unknown1, 4)
 	buf.SetBitsNext(mii.Unknown2, 4)
 	buf.SetBitsNext(mii.Unknown3, 4)
@@ -457,7 +457,7 @@ func (mii *Mii) Encode() []byte {
 	buf.WriteBytesNext(utils.EncodeBytesFromUTF8String(mii.AuthorName))
 	buf.WriteBytesNext(mii.Unknown10)
 	buf.WriteBytes(0x00, swapMiiEndiannessToBig(buf.Bytes()))
-	buf.WriteU16LENext([]uint16{utils.CRC16(buf.Bytes())})
+	buf.WriteU16LENext([]uint16{utils.CRC16(buf.Bytes())})*/
 
 	return buf.Bytes()
 
