@@ -115,7 +115,7 @@ const (
 	MailAddressDomainNameNotAcceptableError    AccountServerError = "1125"
 	MailAddressDomainNameNotResolvedError      AccountServerError = "1126"
 	CountryNotProvidedError                    AccountServerError = "1200"
-	BadRequestError                            AccountServerError = "1600" // pretendo-specific?
+	BadRequestError                            AccountServerError = "1600" // server was unable to process request
 	InternalServerError                        AccountServerError = "2001"
 	UnderMaintenanceError                      AccountServerError = "2002"
 	NintendoNetworkClosedError                 AccountServerError = "2999"
