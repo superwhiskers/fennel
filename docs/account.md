@@ -10,7 +10,7 @@ checks if a user id is taken or not
 
 #### request parameters
 
-- **nnid**: the nnid of the user you want to check the existance of
+- **nnid**: the nnid of the user you want to check the existence of
 
 #### responses
 
@@ -23,7 +23,7 @@ checks if a user id is taken or not
 
 #### examples
 
-##### nonexistant user
+##### nonexistent user
 
 ```
 GET https://account.nintendo.net/v1/api/people/<any nonexistent user>
