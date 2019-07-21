@@ -10,7 +10,7 @@ checks if a user id is taken or not
 
 #### request parameters
 
-    - **nnid**: the nnid of the user you want to check the existance of
+- **nnid**: the nnid of the user you want to check the existance of
 
 #### responses
 
@@ -62,8 +62,8 @@ returns the nn eula of the specified version for the specified country
 
 #### request parameters
 
-    - **country-code**: pretty much any valid ISO 3166-1 alpha-2 country code
-    - **version**: the version of the eula to get. providing `@latest` gets you the latest one
+- **country-code**: pretty much any valid ISO 3166-1 alpha-2 country code
+- **version**: the version of the eula to get. providing `@latest` gets you the latest one
 
 #### responses
 
@@ -87,8 +87,8 @@ language
 
 #### request parameters
 
-	- **region**: pretty much any valid ISO 3166-1 alpha-2 country code
-	- **lang**: some valid ISO 639-1 language codes. valid ones vary by selected region. if an invalid one is provided, it provides it in english (`en`)
+- **region**: pretty much any valid ISO 3166-1 alpha-2 country code
+- **lang**: some valid ISO 639-1 language codes. valid ones vary by selected region. if an invalid one is provided, it provides it in english (`en`)
 
 #### responses
 
@@ -132,14 +132,14 @@ map given input to an output
 
 #### valid types
 
-	- `user_id`: an nnid
-	- `pid`: a pid
+- `user_id`: an nnid
+- `pid`: a pid
 
 #### request parameters
 
-	- **input\_type**: the type of the input. must be one of the valid types
-	- **output\_type**: the type of the output expected. must be one of the valid types
-	- **input**: the input
+- **input\_type**: the type of the input. must be one of the valid types
+- **output\_type**: the type of the output expected. must be one of the valid types
+- **input**: the input
 
 #### responses
 
