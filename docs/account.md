@@ -152,3 +152,7 @@ map given input to an output
 #### examples
 
 ##### TODO: add request examples
+
+### **get** /devices/:device/status
+
+#### TODO: actually add information here

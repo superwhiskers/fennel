@@ -54,6 +54,10 @@ you should see output like this
 </errors>
 ```
 
+### interacting with the api easily
+
+if you haven't already noticed, there's a perl script called `nn-curl` in this directory that does exactly
+what the `curl` command can do, without having to add all of that additional flags each time. give it a try!
 if not, then something is wrong, and you should check the command you just typed,
 or check for the files `headers`, `cert.pem`, and `key.pem` in your current diretory
 
