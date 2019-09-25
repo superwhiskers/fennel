@@ -22,7 +22,8 @@ use strict;
 use warnings;
 use v5.10;
 
-use IO::Socket::SSL::Utils; use LWP::UserAgent;
+use IO::Socket::SSL::Utils;
+use LWP::UserAgent;
 use HTTP::Headers;
 use XML::LibXML::PrettyPrint;
 use XML::LibXML;
