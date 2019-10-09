@@ -9,5 +9,5 @@ file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
 */
 
-// Package fennel implements a generic nintendo network utility library in golang
-package fennel
+// Package types contains utilities for handling different types of data used by nintendo
+package types
