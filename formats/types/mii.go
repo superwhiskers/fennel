@@ -12,7 +12,7 @@ file, you can obtain one at http://mozilla.org/MPL/2.0/.
 package types
 
 import (
-	"github.com/superwhiskers/crunch"
+	crunch "github.com/superwhiskers/crunch/v3"
 	"github.com/superwhiskers/fennel/utils"
 )
 

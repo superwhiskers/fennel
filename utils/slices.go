@@ -74,7 +74,7 @@ func CRC16(data []byte) (hash uint16) {
 			}
 			i2++
 			if i2 < 8 {
-				
+
 				goto hash_add_loop
 
 			}

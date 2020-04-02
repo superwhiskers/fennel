@@ -61,6 +61,6 @@ if you did, then you are ready to interact with the nn rest api using curl!
 
 ### interacting with the api easily
 
-if you haven't already noticed, there's a perl script called `nn-curl` in this directory
-that does exactly what the `curl` command can do, without having to add all of
-those additional flags each time. give it a try!
+if you haven't already noticed, there's a posix shell script called `nn-curl` in this
+directory that does exactly what the `curl` command can do, without having to add all
+of those additional flags each time. give it a try!

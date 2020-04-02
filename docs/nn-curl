@@ -1,41 +1,21 @@
-#!/usr/bin/env perl
+#!/bin/bash
 
-#
-# nn-curl - a tool for easily getting information from nintendo network http endpoints
-# Copyright (C) 2018-2019 superwhiskers <whiskerdev@protonmail.com>
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#
+DEFAULT_HEADERS="X-Nintendo-Client-ID: ea25c66c26b403376b4c5ed94ab9cdea
+X-Nintend-FPD-Version: 0000
+X-Nintendo-Client-Secret: d137be62cb6a2b831cad8c013b92fb55
+X-Nintendo-Platform-ID: 1
+X-Nintendo-Device-Type;
+X-Nintendo-Device-ID: 1
+X-Nintendo-Serial-Number: 1
+X-Nintendo-System-Version: 1111
+X-Nintendo-Region: 2
+X-Nintendo-Country: US
+X-Nintendo-Environment: L1
+X-Nintendo-Device-Cert;"
 
-use strict;
-use warnings;
-use v5.10;
-
-use IO::Socket::SSL::Utils;
-use LWP::UserAgent;
-use HTTP::Headers;
-use XML::LibXML::PrettyPrint;
-use XML::LibXML;
-use Getopt::Long;
-
-# xml pretty-printer
-my $xml_pretty_printer = XML::LibXML::PrettyPrint->new(indent_string => '  ');
-
-# client certificate and key
-my $client_certificate = IO::Socket::SSL::Utils::PEM_string2cert('Bag Attributes
+CLIENT_CERTIFICATE="Bag Attributes
     localKeyID: 16 7D DD F2 84 6D 96 0E 82 A1 34 8E 34 EB 07 2B 94 4D 63 73 
-subject=C = US, ST = Washington, L = Redmond, O = "Nintendo of America, Inc.", OU = IS, CN = CTR Common Prod 1, emailAddress = ca@noa.nintendo.com
+subject=C = US, ST = Washington, L = Redmond, O = \"Nintendo of America, Inc.\", OU = IS, CN = CTR Common Prod 1, emailAddress = ca@noa.nintendo.com
 
 issuer=C = US, ST = Washington, O = Nintendo of America Inc., OU = IS, CN = Nintendo CA - G3
 
@@ -66,9 +46,9 @@ RNoXDBTx6XzsC07CA3uaxEdeWjC5Nl29AHuZ1YC/Z+7Da57TwBaa+/APj4y5mGUa
 ahbvwpe1t3GSNOS5nBDSeCHAKLmzfnXpliA5qQZxo94RSXIVWK8hilXoFDQCL904
 OGpgZnAhz4p3rcJYTq9ub8n6NYr9OJKKbWXfJY1QK4pXFVcIuAph0o/EyzDIEXuT
 J4Q4b2km8uI0H4yxsQwUX9Epw6Vbujc=
------END CERTIFICATE-----');
+-----END CERTIFICATE-----"
 
-my $client_certificate_key = IO::Socket::SSL::Utils::PEM_string2key('Bag Attributes
+CLIENT_CERTIFICATE_KEY="Bag Attributes
     localKeyID: 16 7D DD F2 84 6D 96 0E 82 A1 34 8E 34 EB 07 2B 94 4D 63 73 
 Key Attributes: <No Attributes>
 -----BEGIN PRIVATE KEY-----
@@ -98,114 +78,9 @@ f95t/9UeyWKmH8KzwuF9igfg+vT/5sJAsMJaKzU6OiECgYEAlKK+RKTYwquD+3gK
 o1gsGI+nR96Cb1kvfXzsj+V5UkZchew2pOqhrqpPknGIlFCeTDYjN8jqJyX4EljJ
 1FTegfhfSe+XR7KOIh8b+d+fgftyRIp3M//BUF1FtwL789f/VakaIkz6Ret/+8tA
 3UHqKKGtgSRL9kiTMVYy64pBG9A=
------END PRIVATE KEY-----');
+-----END PRIVATE KEY-----"
 
-# help message
-my $help = "usage: $0 [options] url
-make requests to nintendo http servers
-example: $0 'https://account.nintendo.net/v1/api/people/scott0852'
-
-options:
-  -m, --method method   specify the http method to use
-  -d, --data key=value  http post data
-  -p, --prettify-xml    format xml output
-  -h, --help            show this message
-";
-
-# argument-holding variables
-my $method = 'GET';     # method to be used for the http request
-my @raw_post_data = (); # POST data sent in the request body. implies `-m POST`
-my $prettify_xml = '';  # whether to prettify xml output or not
-my $show_help = '';     # whether to show the help message or not
-
-# parse arguments
-GetOptions(
-	'method=s'     => \$method,
-	'data=s'       => \@raw_post_data,
-	'prettify-xml' => \$prettify_xml,
-	'help'         => \$show_help,
-) or die($help);
-
-# show help if wanted
-if ($show_help) {
-	die($help);
-}
-
-# check if a url was provided
-if (scalar @ARGV < 1) {
-	say('no url was provided');
-	die($help);
-}
-
-# create a hash out of the post array if needed
-my @post_form;
-if (scalar @raw_post_data > 0) {
-	$method = 'POST';
-	foreach my $pair (@raw_post_data) {
-		my ($k, $v) = split(/\=/, $pair, 2);
-		push(@post_form, $k => $v);
-	}
-}
-
-# make the request
-my $client = LWP::UserAgent->new(
-	default_headers   => HTTP::Headers->new(
-		'X-Nintendo-Client-ID'      => 'ea25c66c26b403376b4c5ed94ab9cdea',
-		'X-Nintendo-FPD-Version'    => '0000',
-		'X-Nintendo-Client-Secret'  => 'd137be62cb6a2b831cad8c013b92fb55',
-		'X-Nintendo-Platform-ID'    => '1',
-		'X-Nintendo-Device-Type'    => '',
-		'X-Nintendo-Device-ID'      => '1',
-		'X-Nintendo-Serial-Number'  => '1',
-		'X-Nintendo-System-Version' => '1111',
-		'X-Nintendo-Region'         => '2',
-		'X-Nintendo-Country'        => 'US',
-		'X-Nintendo-Environment'    => 'L1',
-		'X-Nintendo-Device-Cert'    => '',
-	),
-	protocols_allowed => ['http', 'https'],
-	timeout           => 180,
-	ssl_opts          => {
-		verify_hostname => 0,
-		SSL_cert        => $client_certificate,
-		SSL_key         => $client_certificate_key,
-	},
-);
-$client->env_proxy;
-
-my $response;
-if ($method eq 'POST') {
-	$response = $client->request(
-		HTTP::Request->new(
-			'POST',
-			$ARGV[0],
-			['Content-Type'=> 'form-data'],
-			Content => @post_form,
-		),
-	);
-} else {
-	$response = $client->request(
-		HTTP::Request->new($method, $ARGV[0]),
-	);
-}
-
-# output response results
-say($response->protocol, ' ', $response->status_line);
-say($response->headers->as_string);
-
-# handle the possible case that it may not be xml
-if (defined($response->headers->header('Content-Type'))) {
-	if (index($response->headers->header('Content-Type'), 'application/xml') != -1) {
-		my $parsed_document = XML::LibXML->load_xml(string => $response->content);
-		if ($prettify_xml) {
-			$xml_pretty_printer->pretty_print($parsed_document);
-		}
-		say($parsed_document->toString);
-	} else {
-		say($response->content);
-	}
-	# potentially add more cases here
-} else {
-	say($response->content);
-}
-
+clean(){ rm -f /tmp/nncurl_*; } && trap clean EXIT
+(echo "${CLIENT_CERTIFICATE}" > /tmp/nncurl_clientcert || exit) && (echo "${CLIENT_CERTIFICATE_KEY}" > /tmp/nncurl_clientcertkey || exit)
+OUTPUT=$(curl --silent -D /tmp/nncurl_respheaders -H "${DEFAULT_HEADERS}" --cert /tmp/nncurl_clientcert --key /tmp/nncurl_clientcertkey -k $*) || exit
+(which xmllint 2>/dev/null >/dev/null && echo "$(cat /tmp/nncurl_respheaders 2>/dev/null)" && (echo "${OUTPUT}" | xmllint --format - 2>/dev/null || echo "error: unable to parse xml")) || (echo "$(cat /tmp/nncurl_respheaders 2>/dev/null)" && echo "${OUTPUT}")

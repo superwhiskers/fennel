@@ -6,6 +6,10 @@ github.com/klauspost/cpuid v1.2.1 h1:vJi+O/nMdFt0vqm8NZBI6wzALWdA2X+egi0ogNyrC/w
 github.com/klauspost/cpuid v1.2.1/go.mod h1:Pj4uuM528wm8OyEC2QMXAi2YiTZ96dNQPGgoMS4s3ek=
 github.com/superwhiskers/crunch v1.0.0 h1:gzsf72FCZpVb9Oi+hYxLfqKh94Wn3cSc90niPBJLrCU=
 github.com/superwhiskers/crunch v1.0.0/go.mod h1:gMTDRBtldLvMme5GFubPOneNkAsztJeTWIpTJrQJh74=
+github.com/superwhiskers/crunch v3.3.0+incompatible h1:3LwRJiBOSt9BofPDzi6LE5O3WAvQexDYZSCFR1+XyoA=
+github.com/superwhiskers/crunch v3.3.0+incompatible/go.mod h1:0krE1Ye2uOCF+IKFt3GAlZQ5gwWHVheHwLD7XNuBQY8=
+github.com/superwhiskers/crunch/v3 v3.3.1 h1:1j4MgfrcKD2brBXpH7zv9LM6cjvd9kXmBkZLN/ev1pw=
+github.com/superwhiskers/crunch/v3 v3.3.1/go.mod h1:QPnRT1vnbestoz2cCUYg7+yN9x9e9VRJDZi90pdTAIA=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasthttp v1.5.0 h1:dhq+O9pmNZFF6qAXpasMO1xSm7dL4qEz2ylfZN8BG9w=
