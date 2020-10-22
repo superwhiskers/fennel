@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 DEFAULT_HEADERS="X-Nintendo-Client-ID: ea25c66c26b403376b4c5ed94ab9cdea
 X-Nintend-FPD-Version: 0000
